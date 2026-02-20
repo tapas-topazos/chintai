@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <!-- 検索エンジンに表示させない設定 -->
+    <meta name="robots" content="noindex, nofollow">
+   
+    <title>賃貸比較ノート - My Room Plan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Zen+Maru+Gothic:wght@400;500;700&display=swap" rel="stylesheet">
+   
+    <!-- Firebase SDK (v9系互換のcompat版) -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-beige': '#fcfbf9',
+                        'brand-sand': '#eaddcf',
+                        'brand-blue': '#476a85',
+                        'brand-blue-light': '#8faabf',
+                        'brand-accent': '#d4a373',
+                    },
+                    fontFamily: {
+                        sans: ['"Zen Maru Gothic"', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Zen Maru Gothic', sans-serif;
+            background-color: #fcfbf9;
+            color: #4a4a4a;
+            min-height: 100vh;
+            background-image: url('https://images.unsplash.com/photo-1586023492125-27b2c045efd7?q=80&w=2600&auto=format&fit=crop');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            overscroll-behavior-y: none;
+        }
+       
+        .bg-overlay {
+            background: rgba(252, 251, 249, 0.92);
+            backdrop-filter: blur(4px);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card { transition: all 0.3s ease; background: rgba(255, 255, 255, 0.95); }
+        .card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px -5px rgba(71, 106, 133, 0.15); }
+       
+        .fade-in { animation: fadeIn 0.3s ease-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+       
+        /* 入力フォーム */
+        .input-group label { font-size: 13px; font-weight: 700; color: #8faabf; display: block; margin-bottom: 6px; letter-spacing: 0.05em; }
+        .input-group input, .input-group textarea, .input-group select {
+            width: 100%; padding: 12px 14px;
+            border: 2px solid #f0eee9; border-radius: 10px;
+            font-size: 16px; outline: none; transition: all 0.2s; background: #fff; color: #476a85;
+        }
+        .input-group input:focus, .input-group textarea:focus, .input-group select:focus {
+            border-color: #8faabf; box-shadow: 0 0 0 3px rgba(143, 170, 191, 0.1);
+        }
+
+        /* チェックボックス */
+        .checkbox-group label { display: flex; align-items: center; font-weight: 500; color: #555; font-size: 14px; cursor: pointer; padding: 8px 0; }
+        .checkbox-group input[type="checkbox"] {
+            appearance: none; width: 20px; height: 20px; border: 2px solid #cbd5e1; border-radius: 4px; margin-right: 10px; cursor: pointer; position: relative; background: white; flex-shrink: 0;
+        }
+        .checkbox-group input[type="checkbox"]:checked { background-color: #476a85; border-color: #476a85; }
+        .checkbox-group input[type="checkbox"]:checked::after { content: '✓'; position: absolute; color: white; font-size: 14px; top: 50%; left: 50%; transform: translate(-50%, -50%); }
+
+        /* フィルタモーダル用チェックボックス */
+        .filter-checkbox-item {
+            display: flex; align-items: center; padding: 8px; border-bottom: 1px solid #f0f0f0; cursor: pointer;
+        }
+        .filter-checkbox-item:last-child { border-bottom: none; }
+        .filter-checkbox-item:hover { background-color: #f8fafc; }
+
+        /* スクロールバー */
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
+
+        /* 接続ステータス表示 */
+        .status-badge {
+            font-size: 10px; padding: 2px 8px; border-radius: 12px; font-weight: bold;
+        }
+        .status-connected { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+        .status-offline { background: #f1f5f9; color: #64748b; border: 1px solid #cbd5e1; }
+    </style>
+</head>
+<body>
+   
+    <!-- ロック画面（パスワード入力） -->
+    <div id="authScreen" class="fixed inset-0 z-[100] bg-brand-blue flex flex-col items-center justify-center p-4">
+        <div class="bg-white rounded-2xl p-8 shadow-2xl w-full max-w-sm text-center">
+            <div class="w-16 h-16 bg-brand-sand rounded-full flex items-center justify-center mx-auto mb-4 text-white text-2xl shadow-md">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h2 class="text-xl font-bold text-brand-blue mb-2">賃貸比較ノート</h2>
+            <p class="text-sm text-slate-400 mb-6">合言葉を入力してください</p>
+            <input type="password" id="passwordInput" placeholder="Passcode" class="w-full p-3 border-2 border-slate-200 rounded-xl text-center text-lg mb-4 focus:border-brand-blue-light focus:outline-none transition">
+            <button onclick="checkPassword()" class="w-full py-3 bg-brand-blue text-white font-bold rounded-xl shadow-lg hover:bg-[#355269] transition">ロック解除</button>
+            <p id="authError" class="text-red-500 text-xs mt-3 hidden font-bold">合言葉が間違っています</p>
+        </div>
+    </div>
+
+    <!-- アプリ画面（初期状態は非表示） -->
+    <div id="appContainer" class="bg-overlay hidden">
+
+        <!-- ヘッダー -->
+        <header class="bg-white/90 backdrop-blur-md shadow-sm sticky top-0 z-30 border-b border-brand-sand/30">
+            <div class="max-w-6xl mx-auto px-4 py-3 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-brand-blue text-white w-9 h-9 rounded-full flex items-center justify-center shadow-md flex-shrink-0"><i class="fas fa-couch text-sm"></i></div>
+                    <div class="hidden sm:block">
+                        <h1 class="font-bold text-lg text-brand-blue tracking-wide">賃貸比較</h1>
+                        <div class="flex items-center gap-2">
+                            <p class="text-[10px] text-brand-blue-light font-medium">My Room Plan</p>
+                            <span id="connectionStatus" class="status-badge status-offline">未接続</span>
+                        </div>
+                    </div>
+                </div>
+               
+                <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                    <!-- 条件メモボタン -->
+                    <button onclick="openConditionModal()" class="bg-pink-50 text-pink-500 w-9 h-9 rounded-full flex items-center justify-center shadow-sm border border-pink-100 hover:bg-pink-100 transition mr-1 flex-shrink-0" title="ふたりの希望条件">
+                        <i class="fas fa-heart"></i>
+                    </button>
+
+                    <div class="bg-brand-beige border border-brand-sand rounded-full p-1 flex shadow-inner flex-shrink-0">
+                        <button onclick="switchView('list')" id="btn-list" class="bg-brand-blue text-white px-4 py-1.5 rounded-full text-xs font-bold transition shadow-sm flex items-center whitespace-nowrap"><i class="fas fa-list mr-1"></i>一覧</button>
+                        <button onclick="switchView('compare')" id="btn-compare" class="text-brand-blue-light px-4 py-1.5 rounded-full text-xs font-bold transition hover:text-brand-blue hover:bg-white/50 flex items-center whitespace-nowrap"><i class="fas fa-table mr-1"></i>比較</button>
+                    </div>
+                   
+                    <!-- 更新ボタン（手動リロード用） -->
+                    <button onclick="location.reload()" class="text-brand-blue-light hover:text-brand-blue w-9 h-9 flex items-center justify-center transition" title="更新"><i class="fas fa-sync-alt"></i></button>
+                </div>
+            </div>
+        </header>
+
+        <!-- メインコンテンツ -->
+        <main class="max-w-6xl mx-auto p-4 w-full flex-1 overflow-x-hidden">
+
+            <!-- 新規登録ボタン -->
+            <div class="mb-6 fade-in">
+                <button onclick="openModal()" class="w-full bg-white/80 border-2 border-dashed border-brand-blue-light/30 text-brand-blue-light hover:text-brand-blue hover:border-brand-blue/50 hover:bg-brand-blue/5 font-bold py-4 rounded-xl transition flex items-center justify-center gap-2 group shadow-sm">
+                    <span class="bg-brand-blue/10 rounded-full w-8 h-8 flex items-center justify-center group-hover:bg-brand-blue/20 transition"><i class="fas fa-plus text-brand-blue"></i></span>
+                    <span class="text-base">新しい物件を登録する</span>
+                </button>
+            </div>
+
+            <!-- リストビュー -->
+            <div id="listView" class="fade-in">
+                <div class="flex justify-between items-center mb-4 px-1">
+                    <h2 class="text-base md:text-lg font-bold text-brand-blue flex items-center">
+                        <i class="fas fa-bookmark text-brand-accent mr-2"></i>検討リスト <span id="countBadge" class="ml-2 bg-brand-sand/50 text-brand-blue px-2 py-0.5 rounded text-xs font-bold border border-brand-sand">0件</span>
+                    </h2>
+                    <button onclick="clearAllData()" class="text-xs text-brand-blue-light hover:text-red-400 transition flex items-center gap-1 px-3 py-1 rounded hover:bg-red-50"><i class="fas fa-trash-alt"></i> 全削除</button>
+                </div>
+                <div id="propertyGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </div>
+
+            <!-- 比較表ビュー -->
+            <div id="compareView" class="hidden fade-in">
+                <div class="flex justify-between items-center mb-4 px-1">
+                    <h2 class="text-base md:text-lg font-bold text-brand-blue flex items-center">
+                        <i class="fas fa-balance-scale-right text-brand-accent mr-2"></i>詳細比較
+                    </h2>
+                    <!-- フィルタボタン (3件以上のときJSで表示) -->
+                    <div id="compareFilterArea" class="hidden">
+                        <button onclick="openFilterModal()" class="text-xs bg-white border border-brand-sand px-3 py-1.5 rounded-lg text-brand-blue-light hover:bg-brand-blue hover:text-white transition flex items-center gap-2 shadow-sm font-bold">
+                            <i class="fas fa-filter"></i> 表示物件を選ぶ
+                        </button>
+                    </div>
+                </div>
+               
+                <div class="bg-white/95 rounded-2xl shadow-lg border border-white overflow-hidden backdrop-blur-sm">
+                    <div class="overflow-x-auto pb-2">
+                        <table class="w-full text-left text-sm whitespace-nowrap">
+                            <thead class="bg-brand-beige text-brand-blue border-b border-brand-sand/50">
+                                <tr id="compareHeader">
+                                    <th class="p-4 bg-brand-beige border-r border-brand-sand/50 sticky left-0 z-20 w-28 md:w-32 font-bold text-xs uppercase tracking-wider shadow-[2px_0_8px_-2px_rgba(0,0,0,0.05)] text-brand-blue-light">項目</th>
+                                </tr>
+                            </thead>
+                            <tbody id="compareBody" class="divide-y divide-brand-sand/30 text-slate-600"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <footer class="text-center py-6 text-xs text-brand-blue-light/60">&copy; Rental Note / Cloud Sync App</footer>
+    </div>
+
+    <!-- 物件登録・編集モーダル -->
+    <div id="modal" class="fixed inset-0 bg-brand-blue/40 backdrop-blur-sm hidden z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white w-full sm:max-w-2xl rounded-t-3xl sm:rounded-3xl shadow-2xl h-[90vh] sm:h-auto sm:max-h-[90vh] flex flex-col animate-slide-up border border-brand-sand">
+           
+            <div class="p-4 border-b border-brand-sand/30 flex justify-between items-center bg-brand-beige rounded-t-3xl sticky top-0 z-10">
+                <h3 class="font-bold text-lg text-brand-blue flex items-center gap-2" id="modalTitle"><i class="fas fa-pen text-brand-sand"></i> 物件登録</h3>
+                <button onclick="closeModal()" class="w-8 h-8 rounded-full bg-white border border-brand-sand/50 text-brand-blue-light hover:bg-brand-sand/30 transition flex items-center justify-center"><i class="fas fa-times"></i></button>
+            </div>
+
+            <div class="p-5 overflow-y-auto flex-1 bg-white custom-scrollbar pb-20">
+                <input type="hidden" id="editId">
+               
+                <!-- 基本情報エリア -->
+                <div class="bg-brand-beige/50 p-4 rounded-2xl border border-brand-sand/30 mb-6">
+                    <div class="input-group mb-4">
+                        <label>物件名 <span class="text-red-400 text-xs ml-1">*</span></label>
+                        <input type="text" id="name" placeholder="例: メゾン青空 201" class="font-bold text-lg text-brand-blue border-brand-sand/50">
+                    </div>
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div class="input-group"><label>家賃 (万円)</label><input type="number" step="0.1" id="rent" placeholder="0.0"></div>
+                        <div class="input-group"><label>管理費 (円)</label><input type="number" id="adminFee" placeholder="0"></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="input-group"><label>敷金 (ヶ月)</label>
+                            <select id="deposit">
+                                <option value="-">-</option><option value="0">0</option><option value="0.5">0.5</option><option value="1">1</option><option value="1.5">1.5</option><option value="2">2</option><option value="3">3</option>
+                            </select>
+                        </div>
+                        <div class="input-group"><label>礼金 (ヶ月)</label>
+                            <select id="keyMoney">
+                                <option value="-">-</option><option value="0">0</option><option value="0.5">0.5</option><option value="1">1</option><option value="1.5">1.5</option><option value="2">2</option><option value="3">3</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 詳細スペック -->
+                <h4 class="text-xs font-bold text-brand-blue-light uppercase mb-3 px-1">基本データ</h4>
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <div class="input-group"><label>構造</label>
+                        <select id="structure">
+                            <option value="">選択</option>
+                            <option value="鉄筋系">鉄筋系</option><option value="鉄骨系">鉄骨系</option>
+                            <option value="木造">木造</option><option value="その他">その他</option>
+                        </select>
+                    </div>
+                    <div class="input-group"><label>階数 (階)</label><input type="number" id="floor" placeholder="2"></div>
+                    <div class="input-group"><label>方位</label>
+                        <select id="direction">
+                            <option value="">選択</option>
+                            <option value="北">北</option><option value="北東">北東</option><option value="東">東</option><option value="南東">南東</option>
+                            <option value="南">南</option><option value="南西">南西</option><option value="西">西</option><option value="北西">北西</option>
+                        </select>
+                    </div>
+                    <div class="input-group"><label>最寄駅</label><input type="text" id="station" placeholder="新宿駅"></div>
+                    <div class="input-group"><label>駅徒歩 (分)</label><input type="number" min="0" id="walk" placeholder="5"></div>
+                   
+                    <div class="input-group">
+                        <label>間取り</label>
+                        <select id="layout">
+                            <option value="">選択</option>
+                            <option value="1R">1R</option> <option value="1K">1K</option> <option value="1DK">1DK</option> <option value="1LDK">1LDK</option>
+                            <option value="2K">2K</option> <option value="2DK">2DK</option> <option value="2LDK">2LDK</option>
+                            <option value="3K">3K</option> <option value="3DK">3DK</option> <option value="3LDK">3LDK</option>
+                            <option value="4K以上">4K以上</option>
+                        </select>
+                    </div>
+                    <div class="input-group"><label>広さ (㎡)</label><input type="number" step="0.01" id="size" placeholder="25.0"></div>
+                    <div class="input-group"><label>築年数 (年)</label><input type="number" id="age" placeholder="10"></div>
+                </div>
+
+                <!-- 設備 -->
+                <h4 class="text-xs font-bold text-brand-blue-light uppercase mb-3 px-1">設備・条件</h4>
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-6 checkbox-group grid grid-cols-2 gap-3">
+                    <label><input type="checkbox" name="feature" value="駅徒歩10分以内"> 駅徒歩10分以内</label>
+                    <label><input type="checkbox" name="feature" value="2階以上"> 2階以上</label>
+                    <label><input type="checkbox" name="feature" value="バストイレ別"> バストイレ別</label>
+                    <label><input type="checkbox" name="feature" value="追炊機能"> 追炊機能</label>
+                    <label><input type="checkbox" name="feature" value="浴室乾燥"> 浴室乾燥</label>
+                    <label><input type="checkbox" name="feature" value="洗面所独立"> 洗面所独立</label>
+                    <label><input type="checkbox" name="feature" value="二口コンロ以上"> 二口コンロ以上</label>
+                    <label><input type="checkbox" name="feature" value="IHコンロ"> IHコンロ</label>
+                    <label><input type="checkbox" name="feature" value="オートロック"> オートロック</label>
+                    <label><input type="checkbox" name="feature" value="シューズボックス"> シューズボックス</label>
+                    <label><input type="checkbox" name="feature" value="宅配ボックス"> 宅配ボックス</label>
+                    <label><input type="checkbox" name="feature" value="クローゼット"> クローゼット</label>
+                    <label><input type="checkbox" name="feature" value="都市ガス"> 都市ガス</label>
+                    <label><input type="checkbox" name="feature" value="24時間ゴミ出し可"> 24時間ゴミ出し可</label>
+                </div>
+
+                <!-- その他 -->
+                <div class="space-y-4">
+                    <div class="input-group"><label>備考欄</label><textarea id="memo" rows="3" class="bg-brand-beige border-brand-sand/50"></textarea></div>
+                    <div class="input-group"><label>物件URL</label><input type="text" id="url" class="text-xs"></div>
+                </div>
+            </div>
+
+            <div class="p-4 border-t border-brand-sand/30 bg-brand-beige rounded-b-3xl flex gap-3 sticky bottom-0 z-10">
+                <button onclick="deleteProp()" id="btnDelete" class="px-5 py-3 text-red-400 font-bold text-sm bg-white border border-red-100 rounded-xl hover:bg-red-50 transition hidden"><i class="fas fa-trash-alt"></i></button>
+                <button onclick="saveData()" class="flex-1 py-3 bg-brand-blue text-white font-bold rounded-xl shadow-lg hover:bg-[#355269] transform active:scale-95 transition text-base">保存する</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 希望条件メモ モーダル -->
+    <div id="conditionModal" class="fixed inset-0 bg-brand-blue/40 backdrop-blur-sm hidden z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white w-full sm:max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl h-[85vh] sm:h-auto sm:max-h-[80vh] flex flex-col animate-slide-up border border-brand-sand">
+            <div class="p-4 border-b border-brand-sand/30 flex justify-between items-center bg-brand-beige rounded-t-3xl sticky top-0 z-10">
+                <h3 class="font-bold text-lg text-brand-blue flex items-center gap-2"><i class="fas fa-heart text-pink-400"></i> ふたりの希望条件</h3>
+                <button onclick="closeConditionModal()" class="w-8 h-8 rounded-full bg-white border border-brand-sand/50 text-brand-blue-light hover:bg-brand-sand/30 transition flex items-center justify-center"><i class="fas fa-times"></i></button>
+            </div>
+           
+            <div class="p-5 overflow-y-auto flex-1 bg-white" id="conditionModeView">
+                <div class="flex mb-4 bg-slate-100 p-1 rounded-lg">
+                    <button onclick="switchConditionTab('view')" id="tabView" class="flex-1 py-1.5 rounded-md text-sm font-bold bg-white shadow text-brand-blue transition">比較チェック</button>
+                    <button onclick="switchConditionTab('edit')" id="tabEdit" class="flex-1 py-1.5 rounded-md text-sm font-bold text-slate-400 transition">編集する</button>
+                </div>
+
+                <div id="conditionViewArea" class="space-y-4">
+                    <p class="text-xs text-center text-slate-400 mb-2">※共通する希望条件は赤字で強調されます</p>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-blue-50 p-3 rounded-xl border border-blue-100 min-h-[200px]">
+                            <h4 class="text-sm font-bold text-blue-600 mb-2 text-center">Aさんの希望</h4>
+                            <div id="viewListA" class="text-sm space-y-1 text-slate-600"></div>
+                        </div>
+                        <div class="bg-pink-50 p-3 rounded-xl border border-pink-100 min-h-[200px]">
+                            <h4 class="text-sm font-bold text-pink-500 mb-2 text-center">Bさんの希望</h4>
+                            <div id="viewListB" class="text-sm space-y-1 text-slate-600"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="conditionEditArea" class="hidden space-y-4">
+                    <div class="input-group">
+                        <label class="text-blue-500">Aさんの希望 (1行に1つ)</label>
+                        <textarea id="condA" rows="6" class="bg-blue-50/30 border-blue-100 focus:border-blue-300" placeholder="家賃8万円以内&#13;&#10;バストイレ別&#13;&#10;2階以上"></textarea>
+                    </div>
+                    <div class="input-group">
+                        <label class="text-pink-500">Bさんの希望 (1行に1つ)</label>
+                        <textarea id="condB" rows="6" class="bg-pink-50/30 border-pink-100 focus:border-pink-300" placeholder="オートロック必須&#13;&#10;南向き&#13;&#10;バストイレ別"></textarea>
+                    </div>
+                    <button onclick="saveConditions()" class="w-full py-3 bg-brand-accent text-white font-bold rounded-xl shadow-lg hover:bg-orange-400 transition text-sm">条件を保存する</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 比較フィルタ用モーダル -->
+    <div id="filterModal" class="fixed inset-0 bg-brand-blue/20 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
+        <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl border border-brand-sand flex flex-col max-h-[80vh]">
+            <div class="p-4 border-b border-brand-sand/30 flex justify-between items-center bg-brand-beige rounded-t-2xl">
+                <h3 class="font-bold text-brand-blue">比較する物件を選択</h3>
+                <button onclick="closeFilterModal()" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center text-slate-400"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="p-4 overflow-y-auto flex-1 space-y-2" id="filterList"></div>
+            <div class="p-4 border-t border-brand-sand/30 bg-brand-beige rounded-b-2xl flex gap-2 items-center">
+                <button onclick="selectAllFilters(true)" class="text-xs text-brand-blue-light underline hover:text-brand-blue">全選択</button>
+                <div class="w-px h-4 bg-slate-300"></div>
+                <button onclick="selectAllFilters(false)" class="text-xs text-brand-blue-light underline hover:text-brand-blue mr-auto">全解除</button>
+                <button onclick="applyFilters()" class="px-6 py-2 bg-brand-blue text-white font-bold rounded-lg text-sm shadow hover:bg-[#355269]">適用する</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =========================================================
+        // 【設定エリア】
+        // 1. Firebaseの設定（クラウド共有用）
+        const firebaseConfig = {
+ 	apiKey: "AIzaSyD7wf4DtiOBX_gl4uR9YNRrjo5rqjYCkek",
+ 	authDomain: "chintai-bbb46.firebaseapp.com",
+ 	projectId: "chintai-bbb46",
+ 	storageBucket: "chintai-bbb46.firebasestorage.app",
+ 	messagingSenderId: "75423292052",
+ 	appId: "1:75423292052:web:e565f30e47db0d1848b281",
+ 	measurementId: "G-JWLNRKWYT7"
+	};
+
+        // 2. 合言葉の設定（アクセス制限用）
+        const APP_PASSWORD = "1234";
+        // =========================================================
+
+        let db = null;
+        let isOnline = false;
+        let properties = [];
+        let conditions = { a: "", b: "" };
+        let visibleIds = null;
+
+        // --- パスワードロック機能 ---
+        function checkPassword() {
+            const input = document.getElementById('passwordInput').value;
+            const error = document.getElementById('authError');
+            if (input === APP_PASSWORD) {
+                document.getElementById('authScreen').classList.add('hidden');
+                document.getElementById('appContainer').classList.remove('hidden');
+                initApp(); // アプリ開始
+            } else {
+                error.classList.remove('hidden');
+            }
+        }
+
+        // --- 初期化 & Firebase接続 ---
+        function initApp() {
+            if (firebaseConfig && firebaseConfig.apiKey) {
+                try {
+                    firebase.initializeApp(firebaseConfig);
+                    db = firebase.firestore();
+                    isOnline = true;
+                   
+                    const statusEl = document.getElementById('connectionStatus');
+                    statusEl.textContent = "クラウド同期中";
+                    statusEl.className = "status-badge status-connected";
+
+                    // 物件データのリアルタイム受信
+                    db.collection("rental_data").doc("shared_list").onSnapshot((doc) => {
+                        if (doc.exists) {
+                            properties = doc.data().list || [];
+                            render();
+                        } else {
+                            db.collection("rental_data").doc("shared_list").set({ list: [] });
+                        }
+                    });
+
+                    // 条件データのリアルタイム受信
+                    db.collection("rental_data").doc("conditions").onSnapshot((doc) => {
+                        if (doc.exists) {
+                            conditions = doc.data() || { a: "", b: "" };
+                        } else {
+                            db.collection("rental_data").doc("conditions").set({ a: "", b: "" });
+                        }
+                    });
+
+                } catch (e) {
+                    console.error("Firebase Error:", e);
+                    fallbackToLocal();
+                }
+            } else {
+                fallbackToLocal();
+            }
+        }
+
+        function fallbackToLocal() {
+            isOnline = false;
+            properties = JSON.parse(localStorage.getItem('rental_local_v5')) || [];
+            conditions = JSON.parse(localStorage.getItem('rental_conditions_v1')) || { a: "", b: "" };
+            render();
+        }
+
+        // --- データ保存処理 (クラウド/ローカル分岐) ---
+        function saveToStorage() {
+            if (isOnline && db) {
+                db.collection("rental_data").doc("shared_list").set({ list: properties })
+                    .catch(e => alert("保存失敗: " + e.message));
+            } else {
+                localStorage.setItem('rental_local_v5', JSON.stringify(properties));
+                render();
+            }
+        }
+
+        function saveConditionsToStorage() {
+            if (isOnline && db) {
+                db.collection("rental_data").doc("conditions").set(conditions)
+                    .catch(e => alert("条件保存失敗: " + e.message));
+            } else {
+                localStorage.setItem('rental_conditions_v1', JSON.stringify(conditions));
+            }
+        }
+
+        // --- 数値フォーマット ---
+        function formatNum(num) {
+            return num ? Number(num).toLocaleString() : '-';
+        }
+
+        // --- 条件メモ機能 ---
+        function openConditionModal() {
+            document.getElementById('conditionModal').classList.remove('hidden');
+            document.getElementById('condA').value = conditions.a || "";
+            document.getElementById('condB').value = conditions.b || "";
+            renderConditionCheck();
+            switchConditionTab('view');
+        }
+
+        function closeConditionModal() { document.getElementById('conditionModal').classList.add('hidden'); }
+
+        function switchConditionTab(mode) {
+            const viewArea = document.getElementById('conditionViewArea');
+            const editArea = document.getElementById('conditionEditArea');
+            const tabView = document.getElementById('tabView');
+            const tabEdit = document.getElementById('tabEdit');
+
+            if (mode === 'view') {
+                viewArea.classList.remove('hidden'); editArea.classList.add('hidden');
+                tabView.className = "flex-1 py-1.5 rounded-md text-sm font-bold bg-white shadow text-brand-blue transition";
+                tabEdit.className = "flex-1 py-1.5 rounded-md text-sm font-bold text-slate-400 transition hover:bg-slate-200/50";
+                renderConditionCheck();
+            } else {
+                viewArea.classList.add('hidden'); editArea.classList.remove('hidden');
+                tabEdit.className = "flex-1 py-1.5 rounded-md text-sm font-bold bg-white shadow text-brand-blue transition";
+                tabView.className = "flex-1 py-1.5 rounded-md text-sm font-bold text-slate-400 transition hover:bg-slate-200/50";
+            }
+        }
+
+        function saveConditions() {
+            conditions.a = document.getElementById('condA').value;
+            conditions.b = document.getElementById('condB').value;
+            saveConditionsToStorage();
+            alert("条件を保存しました");
+            switchConditionTab('view');
+        }
+
+        function renderConditionCheck() {
+            const listA = (conditions.a || "").split('\n').map(s => s.trim()).filter(s => s);
+            const listB = (conditions.b || "").split('\n').map(s => s.trim()).filter(s => s);
+            const areaA = document.getElementById('viewListA');
+            const areaB = document.getElementById('viewListB');
+            areaA.innerHTML = ''; areaB.innerHTML = '';
+
+            const generateList = (items, targetArea, otherItems) => {
+                if (items.length === 0) {
+                    targetArea.innerHTML = '<span class="text-xs text-slate-400">条件なし</span>';
+                    return;
+                }
+                items.forEach(item => {
+                    const div = document.createElement('div');
+                    if (otherItems.includes(item)) {
+                        div.className = "font-bold text-red-500 bg-white/50 px-2 py-1 rounded border border-red-100 flex items-center";
+                        div.innerHTML = `<i class="fas fa-check mr-1 text-xs"></i> ${item}`;
+                    } else {
+                        div.className = "px-2 py-1 border-b border-slate-100/50";
+                        div.textContent = item;
+                    }
+                    targetArea.appendChild(div);
+                });
+            };
+            generateList(listA, areaA, listB);
+            generateList(listB, areaB, listA);
+        }
+
+        // --- フィルタリング機能 ---
+        function openFilterModal() {
+            const listEl = document.getElementById('filterList');
+            listEl.innerHTML = '';
+            const currentVisible = visibleIds || properties.map(p => p.id);
+
+            properties.forEach(p => {
+                const isChecked = currentVisible.includes(p.id);
+                const div = document.createElement('div');
+                div.className = "flex items-center p-3 border-b border-slate-100 last:border-0 hover:bg-slate-50 cursor-pointer rounded-lg";
+                div.innerHTML = `
+                    <input type="checkbox" class="filter-cb w-5 h-5 text-brand-blue border-slate-300 rounded focus:ring-brand-blue" value="${p.id}" ${isChecked ? 'checked' : ''}>
+                    <span class="ml-3 text-sm text-slate-700 truncate cursor-pointer flex-1" onclick="this.previousElementSibling.click()">${p.name}</span>
+                `;
+                listEl.appendChild(div);
+            });
+            document.getElementById('filterModal').classList.remove('hidden');
+        }
+
+        function closeFilterModal() { document.getElementById('filterModal').classList.add('hidden'); }
+        function selectAllFilters(isSelect) { document.querySelectorAll('.filter-cb').forEach(cb => cb.checked = isSelect); }
+
+        function applyFilters() {
+            const checkboxes = document.querySelectorAll('.filter-cb:checked');
+            const selectedIds = Array.from(checkboxes).map(cb => Number(cb.value));
+            visibleIds = (selectedIds.length === properties.length || selectedIds.length === 0) ? null : selectedIds;
+            render();
+            closeFilterModal();
+        }
+
+        // --- 物件管理機能 (Render) ---
+        function render() {
+            const grid = document.getElementById('propertyGrid');
+            const compHeader = document.getElementById('compareHeader');
+            const compBody = document.getElementById('compareBody');
+           
+            document.getElementById('countBadge').textContent = properties.length + '件';
+            const filterArea = document.getElementById('compareFilterArea');
+            if (properties.length >= 3) {
+                filterArea.classList.remove('hidden');
+            } else {
+                filterArea.classList.add('hidden');
+                visibleIds = null;
+            }
+
+            grid.innerHTML = '';
+            while(compHeader.children.length > 1) compHeader.removeChild(compHeader.lastChild);
+            compBody.innerHTML = '';
+
+            if(properties.length === 0) {
+                grid.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-20"><p class="text-brand-blue font-bold">物件が登録されていません</p></div>`;
+                return;
+            }
+
+            const items = [
+                {k:'rent', l:'家賃', u:'万'}, {k:'adminFee', l:'管理費', u:'円', fmt: true},
+                {k:'totalCost', l:'月額合計', u:'円', fmt: true},
+                {k:'initial_cost', l:'敷/礼', u:''},
+                {k:'structure', l:'構造'}, {k:'floor', l:'階数', u:'階'},
+                {k:'direction', l:'方位'}, {k:'station', l:'最寄駅'}, {k:'walk', l:'駅徒歩', u:'分'},
+                {k:'layout', l:'間取り'}, {k:'size', l:'広さ', u:'㎡'},
+                {k:'age_display', l:'築年数'}, {k:'features', l:'設備'}, {k:'memo', l:'備考'}
+            ];
+
+            const trs = {};
+            items.forEach(item => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-brand-sand/10 transition";
+                tr.innerHTML = `<td class="p-4 border-r border-brand-sand/50 sticky left-0 bg-brand-beige font-bold text-xs text-brand-blue-light shadow-[2px_0_8px_-2px_rgba(0,0,0,0.05)]">${item.l}</td>`;
+                trs[item.k] = tr;
+                compBody.appendChild(tr);
+            });
+
+            // フィルタ適用
+            const targetProperties = visibleIds ? properties.filter(p => visibleIds.includes(p.id)) : properties;
+
+            properties.forEach(p => {
+                // データ加工
+                const rentVal = p.rent ? parseFloat(p.rent) : 0;
+                const adminVal = p.adminFee ? parseInt(p.adminFee) : 0;
+                const totalMonth = (rentVal * 10000) + adminVal;
+               
+                p.totalCost = totalMonth;
+                p.age_display = p.age ? `築${p.age}年` : '-';
+                p.initial_cost = `${p.deposit || '-'} / ${p.keyMoney || '-'}`;
+
+                // カード生成
+                const card = document.createElement('div');
+                card.className = 'card bg-white rounded-2xl border border-white shadow-sm cursor-pointer flex flex-col h-full relative group overflow-hidden';
+                card.onclick = (e) => { if(!e.target.closest('a')) openModal(p.id); };
+               
+                const featureTags = p.features && Array.isArray(p.features)
+                    ? p.features.slice(0, 3).map(f => `<span class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded text-[10px] border border-slate-200">${f}</span>`).join('') : '';
+
+                card.innerHTML = `
+                    <div class="h-2 bg-brand-blue w-full"></div>
+                    <div class="p-6 flex-1 flex flex-col">
+                        <div class="flex justify-between items-start mb-4 gap-3">
+                            <h3 class="font-bold text-brand-blue text-lg line-clamp-2 leading-snug group-hover:text-[#355269] transition">${p.name}</h3>
+                            ${p.layout ? `<span class="bg-brand-beige text-brand-blue text-[11px] px-3 py-1 rounded-lg font-bold whitespace-nowrap border border-brand-sand">${p.layout}</span>` : ''}
+                        </div>
+                        <div class="mb-4 pb-4 border-b border-brand-sand/30">
+                            <div class="flex items-baseline">
+                                <div class="text-3xl font-bold text-brand-blue font-sans">${p.rent || '-'}<span class="text-sm text-brand-blue-light ml-1 font-medium">万円</span></div>
+                                <div class="text-xs text-brand-blue-light ml-3">管理費: ${formatNum(p.adminFee)}円</div>
+                            </div>
+                            <div class="text-xs font-bold text-brand-accent mt-1 text-right">月額計: ${formatNum(totalMonth)}円</div>
+                        </div>
+                        <div class="grid grid-cols-2 gap-3 text-xs text-brand-blue/80 mb-4">
+                            <div class="flex items-center gap-2"><i class="fas fa-train text-brand-accent"></i><span class="truncate">${p.station || '-'}</span></div>
+                            <div class="flex items-center gap-2"><i class="fas fa-walking text-brand-accent"></i>${p.walk ? p.walk+'分' : '-'}</div>
+                            <div class="flex items-center gap-2"><i class="fas fa-expand text-brand-accent"></i>${p.size ? p.size+'㎡' : '-'}</div>
+                            <div class="flex items-center gap-2"><i class="fas fa-layer-group text-brand-accent"></i>${p.floor ? p.floor+'階' : '-'}</div>
+                        </div>
+                        ${featureTags ? `<div class="flex flex-wrap gap-1 mb-4">${featureTags}</div>` : ''}
+                        <div class="mt-5 pt-4 border-t border-brand-sand/30 flex justify-between items-center">
+                            ${p.url ? `<a href="${p.url}" target="_blank" class="text-xs text-brand-blue font-bold hover:underline bg-brand-sand/20 px-3 py-1.5 rounded-full hover:bg-brand-sand/40 transition"><i class="fas fa-external-link-alt mr-1"></i> サイト</a>` : '<span class="text-xs text-brand-sand">URLなし</span>'}
+                            <span class="text-xs text-brand-blue-light group-hover:text-brand-blue transition font-bold flex items-center">編集 <i class="fas fa-pen ml-1 text-[10px]"></i></span>
+                        </div>
+                    </div>`;
+                grid.appendChild(card);
+            });
+
+            // 比較表 (フィルタ適用版)
+            targetProperties.forEach(p => {
+                const th = document.createElement('th');
+                th.className = 'p-5 font-medium text-brand-blue min-w-[180px] border-l border-brand-sand/30 align-top bg-white/50';
+                th.innerHTML = `<div class="flex flex-col h-full justify-between gap-3"><div class="line-clamp-2 text-xs mb-1 font-bold leading-relaxed">${p.name}</div><button onclick="openModal(${p.id})" class="text-[10px] bg-white border border-brand-sand px-3 py-1.5 rounded-lg text-brand-blue-light hover:bg-brand-blue hover:text-white transition">編集</button></div>`;
+                compHeader.appendChild(th);
+
+                items.forEach(item => {
+                    const td = document.createElement('td');
+                    td.className = 'p-4 border-l border-brand-sand/30 text-center text-sm bg-white/30 text-brand-blue';
+                    let val = p[item.k];
+                    if (val === undefined || val === null || val === '') val = '-';
+                    else if (item.fmt) val = formatNum(val);
+
+                    if(item.k === 'memo') {
+                        td.className += ' text-left whitespace-normal min-w-[220px] text-xs text-brand-blue/70 align-top leading-relaxed';
+                        td.innerHTML = `<div class="max-h-24 overflow-y-auto pr-2">${val}</div>`;
+                    } else if (item.k === 'features') {
+                        td.className += ' text-left align-top min-w-[150px]';
+                        if (Array.isArray(val) && val.length > 0) {
+                            td.innerHTML = val.map(f => `<div class="text-xs mb-1 text-brand-blue-light"><i class="fas fa-check text-brand-accent mr-1"></i>${f}</div>`).join('');
+                        } else { td.textContent = '-'; }
+                    } else if (item.k === 'initial_cost') {
+                         td.textContent = (val === '- / -') ? '-' : val + 'ヶ月';
+                    } else {
+                        if(val !== '-' && item.u) val += item.u;
+                        td.textContent = val;
+                        if(item.k === 'rent' || item.k === 'totalCost') td.className += ' font-bold';
+                    }
+                    trs[item.k].appendChild(td);
+                });
+            });
+        }
+
+        // --- モーダル操作 ---
+        function openModal(id = null) {
+            const modal = document.getElementById('modal');
+            const btnDelete = document.getElementById('btnDelete');
+            const title = document.getElementById('modalTitle');
+            document.getElementById('editId').value = id ? id : 'new';
+           
+            const fields = ['name','rent','adminFee','layout','size','floor','station','walk','age','memo','url','deposit','keyMoney','structure','direction'];
+            fields.forEach(f => {
+                const el = document.getElementById(f);
+                if(el) el.value = '';
+            });
+            document.querySelectorAll('input[name="feature"]').forEach(cb => cb.checked = false);
+           
+            if(id) {
+                const p = properties.find(x => x.id === id);
+                if (p) {
+                    title.innerHTML = '<i class="fas fa-pen text-brand-sand"></i> 物件情報の編集';
+                    btnDelete.classList.remove('hidden');
+                    fields.forEach(f => {
+                        const el = document.getElementById(f);
+                        if(el) el.value = p[f] || '';
+                    });
+                    if (p.features && Array.isArray(p.features)) {
+                        p.features.forEach(f => {
+                            const cb = document.querySelector(`input[name="feature"][value="${f}"]`);
+                            if(cb) cb.checked = true;
+                        });
+                    }
+                }
+            } else {
+                title.innerHTML = '<i class="fas fa-plus text-brand-sand"></i> 新しい物件を登録';
+                btnDelete.classList.add('hidden');
+            }
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() { document.getElementById('modal').classList.add('hidden'); }
+
+        function saveData() {
+            try {
+                const idVal = document.getElementById('editId').value;
+                const name = document.getElementById('name').value;
+                if(!name) return alert('物件名は必須です');
+
+                const features = Array.from(document.querySelectorAll('input[name="feature"]:checked')).map(cb => cb.value);
+                const data = {
+                    name,
+                    rent: document.getElementById('rent').value,
+                    adminFee: document.getElementById('adminFee').value,
+                    layout: document.getElementById('layout').value,
+                    size: document.getElementById('size').value,
+                    floor: document.getElementById('floor').value,
+                    station: document.getElementById('station').value,
+                    walk: document.getElementById('walk').value,
+                    age: document.getElementById('age').value,
+                    deposit: document.getElementById('deposit').value,
+                    keyMoney: document.getElementById('keyMoney').value,
+                    structure: document.getElementById('structure').value,
+                    direction: document.getElementById('direction').value,
+                    memo: document.getElementById('memo').value,
+                    url: document.getElementById('url').value,
+                    features: features
+                };
+
+                if (idVal === 'new') {
+                    properties.push({id: Date.now(), ...data});
+                } else {
+                    const targetId = Number(idVal);
+                    const idx = properties.findIndex(x => x.id === targetId);
+                    if(idx > -1) {
+                        properties[idx] = { ...properties[idx], ...data };
+                    } else {
+                        properties.push({id: Date.now(), ...data});
+                    }
+                }
+               
+                saveToStorage();
+                closeModal();
+            } catch (error) {
+                alert("保存エラー: " + error.message);
+                console.error(error);
+            }
+        }
+
+        function deleteProp() {
+            const id = document.getElementById('editId').value;
+            if(!id || id === 'new') return;
+            if(confirm('本当に削除しますか？')) {
+                properties = properties.filter(x => x.id != Number(id));
+                if (visibleIds) visibleIds = visibleIds.filter(vid => vid != Number(id));
+                saveToStorage();
+                closeModal();
+            }
+        }
+
+        function clearAllData() {
+            if(properties.length > 0 && confirm('全てのデータを削除しますか？')) {
+                properties = [];
+                visibleIds = null;
+                saveToStorage();
+            }
+        }
+
+        function switchView(mode) {
+            const list = document.getElementById('listView');
+            const comp = document.getElementById('compareView');
+            const btnL = document.getElementById('btn-list');
+            const btnC = document.getElementById('btn-compare');
+           
+            if(mode === 'list') {
+                list.classList.remove('hidden'); comp.classList.add('hidden');
+                btnL.className = "bg-brand-blue text-white px-4 py-1.5 rounded-full text-xs font-bold transition shadow-sm flex items-center whitespace-nowrap";
+                btnC.className = "text-brand-blue-light px-4 py-1.5 rounded-full text-xs font-bold transition hover:text-brand-blue hover:bg-white/50 flex items-center whitespace-nowrap";
+            } else {
+                list.classList.add('hidden'); comp.classList.remove('hidden');
+                btnC.className = "bg-brand-blue text-white px-4 py-1.5 rounded-full text-xs font-bold transition shadow-sm flex items-center whitespace-nowrap";
+                btnL.className = "text-brand-blue-light px-4 py-1.5 rounded-full text-xs font-bold transition hover:text-brand-blue hover:bg-white/50 flex items-center whitespace-nowrap";
+            }
+        }
+    </script>
+</body>
+</html>
