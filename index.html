@@ -749,16 +749,23 @@
             iframe.src = `https://maps.google.co.jp/maps?output=embed&q=${encodeURIComponent(address)}&t=m&z=15&hl=ja`;
         }
 
-        // ★ 経路検索 (新しいタブでGoogleマップを開く)
-        function calculateRoute() {
-            const origin = document.getElementById('routeStart').value;
-            const destination = document.getElementById('routeEnd').value;
-            if(!origin || !destination) return alert('出発地と目的地を選択してください');
+	// ★ 経路検索 (ブラウザ・アプリ両対応のリンクで開く)
+	function calculateRoute() {
+  	  const origin = document.getElementById('routeStart').value;
+  	  const destination = document.getElementById('routeEnd').value;
 
-            // Google Mapsの経路検索URL (APIキー不要、新タブで開く)
-            const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&travelmode=transit`;
-            window.open(url, '_blank');
-        }
+   	 if (!origin || !destination) {
+   	     return alert('出発地と目的地を選択してください');
+  	  }
+
+ 	   // Google Maps URLs形式の作成
+	    // travelmode=transit を指定することで、電車・バスの経路を優先します
+ 	   const baseUrl = "https://www.google.com/maps/dir/?api=1";
+  	  const url = `${baseUrl}&origin=${encodeURIComponent(origin)}&destination=	${encodeURIComponent(destination)}&travelmode=transit`;
+
+  	  // 新しいタブ（またはアプリ）で開く
+  	  window.open(url, '_blank');
+	}
     </script>
 </body>
 </html>
