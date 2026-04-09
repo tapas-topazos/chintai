@@ -86,7 +86,6 @@
         
         .rank-btn { color: #8faabf; cursor: pointer; transition: color 0.2s; }
         .rank-btn:hover { color: #476a85; }
-		<link rel="apple-touch-icon" sizes="180x180" href="https://min-chi.material.jp/mc/materials/background-c/living2/_living2_1.jpg"> 
 	</style>
 </head>
 <body>
@@ -558,8 +557,6 @@
                             <div class="flex items-center gap-2"><i class="fas fa-walking text-brand-accent"></i>${p.walk?p.walk+'分':'-'}</div>
                             <div class="flex items-center gap-2 col-span-2"><i class="fas fa-map-marker-alt text-brand-accent"></i><span class="truncate">${p.address||'-'}</span></div>
                         </div>
-                        ${fTags?`<div class="flex flex-wrap gap-1 mb-4">${fTags}</div>`:''}
-                        <div class="mt-auto pt-4 border-t border-brand-sand/30 flex justify-between items-center">
                             ${p.url?`<a href="${p.url}" target="_blank" class="text-xs text-brand-blue font-bold hover:underline bg-brand-sand/20 px-3 py-1.5 rounded-full"><i class="fas fa-link"></i> サイト</a>`:'<span class="text-xs text-brand-sand">URLなし</span>'}
                             <button onclick="openModal(${p.id}); event.stopPropagation();" class="text-xs text-brand-blue-light hover:text-brand-blue font-bold">編集 <i class="fas fa-pen ml-1"></i></button>
                         </div>
