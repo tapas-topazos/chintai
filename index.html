@@ -86,7 +86,7 @@
         
         .rank-btn { color: #8faabf; cursor: pointer; transition: color 0.2s; }
         .rank-btn:hover { color: #476a85; }
-	</style>
+    </style>
 </head>
 <body>
     <div id="authScreen" class="fixed inset-0 z-[100] bg-brand-blue flex flex-col items-center justify-center p-4">
@@ -168,7 +168,7 @@
                     <div class="col-span-1 space-y-4">
                         <div class="bg-white p-4 rounded-xl shadow-sm border border-brand-sand">
                             <h3 class="font-bold text-brand-blue mb-2 text-sm"><i class="fas fa-search-location mr-1 text-brand-accent"></i> ルート検索</h3>
-                            <p class="text-[10px] text-slate-500 mb-3">YAHOO!JAPAN路線情報を開いて経路と時間を計算します。</p>
+                            <p class="text-[10px] text-slate-500 mb-3">Googleマップを開いて経路と時間を計算します。</p>
                             <select id="routeStart" onchange="updateIframeMap(this.value)" class="w-full p-2 border border-brand-sand rounded-lg text-sm bg-brand-beige text-brand-blue mb-2"></select>
                             <select id="routeEnd" onchange="updateIframeMap(this.value)" class="w-full p-2 border border-brand-sand rounded-lg text-sm bg-brand-beige text-brand-blue mb-4"></select>
                             <button onclick="calculateRoute()" class="w-full bg-brand-blue text-white font-bold py-3 rounded-xl shadow hover:bg-[#355269] transition"><i class="fas fa-external-link-alt mr-1"></i> 経路を見る</button>
@@ -183,7 +183,7 @@
                             <div class="border-t border-brand-sand/50 pt-3">
                                 <p class="text-[10px] text-brand-blue-light mb-2 font-bold" id="destFormTitle">新規追加</p>
                                 <input type="hidden" id="editDestId" value="">
-                                <input type="text" id="newDestName" placeholder="名称 (例: 職場)" class="w-full p-2 border border-brand-sand rounded-lg text-xs mb-2 focus:border-brand-blue outline-none transition">
+                                <input type="text" id="newDestName" placeholder="名称 (例: 夫の職場)" class="w-full p-2 border border-brand-sand rounded-lg text-xs mb-2 focus:border-brand-blue outline-none transition">
                                 <input type="text" id="newDestAddress" placeholder="住所" class="w-full p-2 border border-brand-sand rounded-lg text-xs mb-2 focus:border-brand-blue outline-none transition">
                                 <div class="flex gap-2">
                                     <button onclick="addDestination()" id="btnSaveDest" class="flex-1 bg-brand-sand text-brand-blue font-bold py-2 rounded-lg text-xs hover:bg-brand-accent hover:text-white transition">追加する</button>
@@ -228,7 +228,9 @@
                 <h4 class="text-xs font-bold text-brand-blue-light uppercase mb-3 px-1">基本データ</h4>
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div class="input-group"><label>最寄駅</label><input type="text" id="station" placeholder="新宿駅"></div>
-                    <div class="input-group"><label>駅徒歩 (分)</label><input type="number" min="0" id="walk" placeholder="5"></div>                    
+                    <div class="input-group"><label>駅徒歩 (分)</label><input type="number" min="0" id="walk" placeholder="5"></div>
+                    <div class="input-group col-span-2"><label>アクセス・想定路線 (メモ)</label><input type="text" id="route" placeholder="例: 夫の職場まで乗換なし30分"></div>
+                    
                     <div class="input-group"><label>構造</label><select id="structure"><option value="">選択</option><option value="鉄筋系">鉄筋系</option><option value="鉄骨系">鉄骨系</option><option value="木造">木造</option><option value="その他">その他</option></select></div>
                     <div class="input-group"><label>階数 (階)</label><input type="number" id="floor" placeholder="2"></div>
                     <div class="input-group"><label>採光面</label><select id="direction"><option value="">選択</option><option value="北">北</option><option value="北東">北東</option><option value="東">東</option><option value="南東">南東</option><option value="南">南</option><option value="南西">南西</option><option value="西">西</option><option value="北西">北西</option></select></div>
@@ -256,7 +258,6 @@
                 </div>
                 <div class="space-y-4">
                     <div class="input-group"><label>備考欄</label><textarea id="memo" rows="3" class="bg-brand-beige border-brand-sand/50"></textarea></div>
-                    <div class="input-group col-span-2"><label>アクセス・想定路線 (メモ)</label><input type="text" id="route" placeholder="例: 職場まで乗換なし30分"></div>
                     <div class="input-group"><label>物件URL</label><input type="text" id="url" class="text-xs"></div>
                 </div>
             </div>
@@ -275,40 +276,34 @@
             </div>
             <div class="p-5 overflow-y-auto flex-1 bg-white" id="conditionModeView">
                 <div class="flex mb-4 bg-slate-100 p-1 rounded-lg">
-                    <button onclick="switchConditionTab('view')" id="tabView" class="flex-1 py-1.5 rounded-md text-sm font-bold bg-white shadow text-brand-blue transition">希望条件の確認</button>
+                    <button onclick="switchConditionTab('view')" id="tabView" class="flex-1 py-1.5 rounded-md text-sm font-bold bg-white shadow text-brand-blue transition">優先順位・確認</button>
                     <button onclick="switchConditionTab('edit')" id="tabEdit" class="flex-1 py-1.5 rounded-md text-sm font-bold text-slate-400 transition">編集する</button>
                 </div>
-
-	<div id="conditionViewArea" class="space-y-4">
-    	<div class="bg-green-50 p-3 rounded-xl border border-green-100 mb-4">
-        	<h4 class="text-sm font-bold text-green-700 mb-2 text-center">共通の希望</h4>
-        	<div id="viewListCommon" class="text-sm space-y-1 text-slate-600"></div>
-    	</div>
-    
-    	<div class="grid grid-cols-2 gap-4">
-        	<div class="bg-blue-50 p-3 rounded-xl border border-blue-100 min-h-[150px]">
-            	<h4 class="text-sm font-bold text-blue-600 mb-2 text-center">Aさんの希望</h4>
-            	<div id="viewListA" class="text-sm space-y-1 text-slate-600"></div>
-        	</div>
-        	<div class="bg-pink-50 p-3 rounded-xl border border-pink-100 min-h-[150px]">
-            	<h4 class="text-sm font-bold text-pink-500 mb-2 text-center">Bさんの希望</h4>
-            	<div id="viewListB" class="text-sm space-y-1 text-slate-600"></div>
-       	 </div>
-    </div>
-</div>
-
-<div id="conditionEditArea" class="hidden space-y-4">
-    <div class="input-group">
-        <label class="text-black">ふたり共通の希望 (1行に1つ)</label>
-        <textarea id="condCommon" rows="3" class="bg-green-50/30 border-green-100 focus:border-green-300" placeholder="家賃8万円以内&#13;&#10;バストイレ別"></textarea>
-    </div>
-    
-    <div class="grid grid-cols-2 gap-4">
-        <div class="input-group"><label class="text-blue-500">Aさん (1行に1つ)</label><textarea id="condA" rows="5" class="bg-blue-50/30 border-blue-100 focus:border-blue-300" placeholder="2階以上"></textarea></div>
-        <div class="input-group"><label class="text-pink-500">Bさん (1行に1つ)</label><textarea id="condB" rows="5" class="bg-pink-50/30 border-pink-100 focus:border-pink-300" placeholder="オートロック必須"></textarea></div>
-    </div>
-    <button onclick="saveConditions()" class="w-full py-3 bg-brand-accent text-white font-bold rounded-xl shadow-lg hover:bg-orange-400 transition text-sm">条件を保存する</button>
-</div>
+                <div id="conditionViewArea" class="space-y-4">
+                    <p class="text-[11px] text-center text-slate-400 mb-2">※矢印ボタンで優先順位を並べ替えられます。共通の希望は赤字で表示されます。</p>
+                    <div class="bg-red-50 p-3 rounded-xl border border-red-100 mb-4">
+                        <h4 class="text-sm font-bold text-red-500 mb-2 text-center">共通の希望</h4>
+                        <div id="viewListCommon" class="text-sm space-y-1 text-slate-600"></div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="bg-blue-50 p-3 rounded-xl border border-blue-100 min-h-[150px]">
+                            <h4 class="text-sm font-bold text-blue-600 mb-2 text-center">Aさんの希望</h4>
+                            <div id="viewListA" class="text-sm space-y-1 text-slate-600"></div>
+                        </div>
+                        <div class="bg-pink-50 p-3 rounded-xl border border-pink-100 min-h-[150px]">
+                            <h4 class="text-sm font-bold text-pink-500 mb-2 text-center">Bさんの希望</h4>
+                            <div id="viewListB" class="text-sm space-y-1 text-slate-600"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="conditionEditArea" class="hidden space-y-4">
+                    <div class="input-group"><label class="text-red-500">ふたり共通の希望 (1行に1つ)</label><textarea id="condCommon" rows="3" class="bg-red-50/30 border-red-100 focus:border-red-300" placeholder="家賃8万円以内&#13;&#10;バストイレ別"></textarea></div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="input-group"><label class="text-blue-500">Aさん (1行に1つ)</label><textarea id="condA" rows="5" class="bg-blue-50/30 border-blue-100 focus:border-blue-300" placeholder="2階以上"></textarea></div>
+                        <div class="input-group"><label class="text-pink-500">Bさん (1行に1つ)</label><textarea id="condB" rows="5" class="bg-pink-50/30 border-pink-100 focus:border-pink-300" placeholder="オートロック必須"></textarea></div>
+                    </div>
+                    <button onclick="saveConditions()" class="w-full py-3 bg-brand-accent text-white font-bold rounded-xl shadow-lg hover:bg-orange-400 transition text-sm">条件を保存する</button>
+                </div>
             </div>
         </div>
     </div>
@@ -450,7 +445,7 @@
                     const div = document.createElement('div');
                     div.className = "flex justify-between items-center px-2 py-1 border-b border-slate-100/50 group";
                     if (highlightCommon || (conditions.common || []).includes(item)) {
-                        div.innerHTML = `<span class="font-bold text-slate-700"><i class="fas fa-check mr-1 text-xs"></i>${item}</span>`;
+                        div.innerHTML = `<span class="font-bold text-red-500"><i class="fas fa-check mr-1 text-xs"></i>${item}</span>`;
                     } else {
                         div.innerHTML = `<span>${item}</span>`;
                     }
@@ -549,7 +544,7 @@
                     <div class="p-6 flex-1 flex flex-col">
                         <div class="flex justify-between items-start mb-4 gap-3"><h3 class="font-bold text-brand-blue text-lg line-clamp-2">${p.name}</h3>${p.layout?`<span class="bg-brand-beige text-brand-blue text-[11px] px-3 py-1 rounded-lg border border-brand-sand">${p.layout}</span>`:''}</div>
                         <div class="mb-4 pb-4 border-b border-brand-sand/30">
-                            <div class="flex items-baseline"><div class="text-3xl font-bold text-brand-blue">${p.rent||'-'}<span class="text-sm ml-1">万円</span></div><div class="text-xs text-brand-blue-light ml-3">管理費: ${formatNum(p.adminFee)}円</div></div>
+                            <div class="flex items-baseline"><div class="text-3xl font-bold text-brand-blue">${p.rent||'-'}<span class="text-sm ml-1">万円</span></div><div class="text-xs text-brand-blue-light ml-3">管: ${formatNum(p.adminFee)}円</div></div>
                             <div class="text-xs font-bold text-brand-accent mt-1 text-right">月額計: ${formatNum(p.totalCost)}円</div>
                         </div>
                         <div class="grid grid-cols-2 gap-3 text-xs text-brand-blue/80 mb-4">
@@ -752,23 +747,52 @@
             iframe.src = `https://maps.google.co.jp/maps?output=embed&q=${encodeURIComponent(address)}&t=m&z=15&hl=ja`;
         }
 
-	// ★ 経路検索 (別タブでYahoo!路線情報を開く)
+        // ★ 経路検索 (Yahoo!路線情報で開く)
 	function calculateRoute() {
-  	  const origin = document.getElementById('routeStart').value;
-  	  const destination = document.getElementById('routeEnd').value;
+    	const origin = document.getElementById('routeStart').value;
+    	const destination = document.getElementById('routeEnd').value;
+    	if(!origin || !destination) return alert('出発地と目的地を選択してください');
 
-  	  if (!origin || !destination) {
-   	     return alert('出発地と目的地を選択してください');
- 	   }
+    	// Yahoo!路線情報の検索結果ページへ（出発地と目的地を渡す）
+    	const url = `https://transit.yahoo.co.jp/search/result?from=${encodeURIComponent(origin)}&to=${encodeURIComponent(destination)}`;
+    	window.open(url, '_blank');
+        }
+	// --- 駅名サジェスト機能 ---
+        function initStationSuggest() {
+            const list = document.getElementById('station-list');
+            let timer;
+            const targetIds = ['station', 'newDestAddress'];
 
- 	   // Yahoo!路線情報の検索URLを作成
- 	   // saddr: 出発地, eaddr: 目的地
-	    const baseUrl = "https://transit.yahoo.co.jp/search/result";
-  	  const url = `${baseUrl}?from=${encodeURIComponent(origin)}&to=${encodeURIComponent(destination)}`;
+            targetIds.forEach(id => {
+                const input = document.getElementById(id);
+                if (!input) return;
 
-  	  // 新しいタブでYahoo!路線情報を開く
- 	   window.open(url, '_blank');
-	}
+                input.addEventListener('input', () => {
+                    clearTimeout(timer);
+                    const keyword = input.value.trim();
+                    if (keyword.length < 2) return;
+
+                    timer = setTimeout(async () => {
+                        const url = `https://express.heartrails.com/api/json?method=getStations&name=${encodeURIComponent(keyword)}`;
+                        try {
+                            const res = await fetch(url);
+                            const data = await res.json();
+                            if (data.response && data.response.station) {
+                                list.innerHTML = '';
+                                const uniqueNames = [...new Set(data.response.station.map(s => s.name))];
+                                uniqueNames.forEach(name => {
+                                    const option = document.createElement('option');
+                                    option.value = name;
+                                    list.appendChild(option);
+                                });
+                            }
+                        } catch (e) { console.error("駅名取得エラー:", e); }
+                    }, 300);
+                });
+            });
+        }
+        // 実行
+        initStationSuggest();
     </script>
 </body>
 </html>
