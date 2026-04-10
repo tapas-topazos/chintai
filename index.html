@@ -747,52 +747,16 @@
             iframe.src = `https://maps.google.co.jp/maps?output=embed&q=${encodeURIComponent(address)}&t=m&z=15&hl=ja`;
         }
 
-        // ★ 経路検索 (Yahoo!路線情報で開く)
-	function calculateRoute() {
-    	const origin = document.getElementById('routeStart').value;
-    	const destination = document.getElementById('routeEnd').value;
-    	if(!origin || !destination) return alert('出発地と目的地を選択してください');
+        // ★ 経路検索 (新しいタブでGoogleマップを開く)
+        function calculateRoute() {
+            const origin = document.getElementById('routeStart').value;
+            const destination = document.getElementById('routeEnd').value;
+            if(!origin || !destination) return alert('出発地と目的地を選択してください');
 
-    	// Yahoo!路線情報の検索結果ページへ（出発地と目的地を渡す）
-    	const url = `https://transit.yahoo.co.jp/search/result?from=${encodeURIComponent(origin)}&to=${encodeURIComponent(destination)}`;
-    	window.open(url, '_blank');
+            // Google Mapsの経路検索URL (APIキー不要、新タブで開く)
+            const url = `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(destination)}&travelmode=transit`;
+            window.open(url, '_blank');
         }
-	// --- 駅名サジェスト機能 ---
-        function initStationSuggest() {
-            const list = document.getElementById('station-list');
-            let timer;
-            const targetIds = ['station', 'newDestAddress'];
-
-            targetIds.forEach(id => {
-                const input = document.getElementById(id);
-                if (!input) return;
-
-                input.addEventListener('input', () => {
-                    clearTimeout(timer);
-                    const keyword = input.value.trim();
-                    if (keyword.length < 2) return;
-
-                    timer = setTimeout(async () => {
-                        const url = `https://express.heartrails.com/api/json?method=getStations&name=${encodeURIComponent(keyword)}`;
-                        try {
-                            const res = await fetch(url);
-                            const data = await res.json();
-                            if (data.response && data.response.station) {
-                                list.innerHTML = '';
-                                const uniqueNames = [...new Set(data.response.station.map(s => s.name))];
-                                uniqueNames.forEach(name => {
-                                    const option = document.createElement('option');
-                                    option.value = name;
-                                    list.appendChild(option);
-                                });
-                            }
-                        } catch (e) { console.error("駅名取得エラー:", e); }
-                    }, 300);
-                });
-            });
-        }
-        // 実行
-        initStationSuggest();
     </script>
 </body>
 </html>
