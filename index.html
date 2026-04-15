@@ -144,12 +144,27 @@
             </div>
 
             <div id="compareView" class="hidden fade-in">
-                <div class="flex justify-between items-center mb-4 px-1">
-                    <h2 class="text-base md:text-lg font-bold text-brand-blue flex items-center"><i class="fas fa-balance-scale-right text-brand-accent mr-2"></i>詳細比較</h2>
+                <div class="flex flex-col md:flex-row justify-between item-start md:items-center mb-4 px-1 gap-3">
+                    <h2 class="text-base md:text-lg font-bold text-brand-blue flex items-center">
+                        <i class="fas fa-balance-scale-right text-brand-accent mr-2"></i>詳細比較
+                    </h2>
+
+<div class="flex items-center gap-3?">
+    <div class="flex items-center bg-white border border-brand-sand rounded-lg text-brand-blue-light px-2 shadow-sm font-bold">
+        <i class="fas fa-sort-amount-down text-brand-blue-light text-xs mr-1"></i>
+        <select id="sortSelect" onchange=" render()" class=text-xs py-1.5 outline-none text-brand-blue bg-transparent font-bold cursor-pointer">
+            <option value="default">登録順</option>
+            <option value="rent_asc">安い順（合計）</option>
+            <option value="walk_asc">近い順（駅徒歩）</option>
+            <option value="age_asc">新しい順（築年数）</option>
+        </select>
+    </div>
+
                     <div id="compareFilterArea">
                         <button onclick="openFilterModal()" class="text-xs bg-white border border-brand-sand px-3 py-1.5 rounded-lg text-brand-blue-light hover:bg-brand-blue hover:text-white transition flex items-center gap-2 shadow-sm font-bold"><i class="fas fa-filter"></i> 表示物件を選ぶ</button>
                     </div>
                 </div>
+            </div>
                 <div class="bg-white/95 rounded-2xl shadow-lg border border-white overflow-hidden backdrop-blur-sm">
                     <div class="overflow-x-auto pb-2">
                         <table class="w-full text-left text-sm whitespace-nowrap">
@@ -178,15 +193,18 @@
                             <h3 class="font-bold text-brand-blue mb-3 text-sm flex items-center justify-between">
                                 <span><i class="fas fa-building mr-1 text-brand-accent"></i> 目的地の管理</span>
                             </h3>
-                            <div id="destListArea" class="max-h-40 overflow-y-auto mb-3 space-y-2 custom-scrollbar pr-1"></div>
-                            
-                            <div class="border-t border-brand-sand/50 pt-3">
-                                <p class="text-[10px] text-brand-blue-light mb-2 font-bold" id="destFormTitle">新規追加</p>
-                                <input type="hidden" id="editDestId" value="">
-                                <input type="text" id="newDestName" placeholder="名称 (例: 職場)" class="w-full p-2 border border-brand-sand rounded-lg text-xs mb-2 focus:border-brand-blue outline-none transition">
-                                <input type="text" id="newDestAddress" placeholder="住所" class="w-full p-2 border border-brand-sand rounded-lg text-xs mb-2 focus:border-brand-blue outline-none transition">
-                                <div class="flex gap-2">
-                                    <button onclick="addDestination()" id="btnSaveDest" class="flex-1 bg-brand-sand text-brand-blue font-bold py-2 rounded-lg text-xs hover:bg-brand-accent hover:text-white transition">追加する</button>
+                                        <div class="relative mb-6">
+                <label class="block text-sm font-bold mb-1 text-gray-500">① 駅名で検索して追加</label>
+                <input type="text" id="station-input" class="w-full border-2 border-brand-sand rounded-xl px-4 py-2 focus:outline-none focus:border-brand-blue" placeholder="駅名を入力 (例: 新宿)" autocomplete="off" oninput="clearMsg('dest-msg1')">
+                <ul id="suggestion-list" class="absolute z-10 w-full mt-1 bg-white border border-brand-sand rounded-xl shadow-xl max-height-[200px] overflow-y-auto hidden"></ul>
+                <div id="dest-msg1" class="text-sm font-bold mt-1 min-h-[1.25rem]"></div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-bold mb-1 text-gray-500">② 住所や建物名で追加</label>
+                <div class="flex gap-2">
+                    <input type="text" id="manual-dest-input" class="flex-1 border-2 border-brand-sand rounded-xl px-4 py-2 focus:outline-none focus:border-brand-blue" placeholder="例: 東京ドーム" oninput="clearMsg('dest-msg2')">
+                    <button class="bg-brand-blue-light text-white px-6 py-2 rounded-xl font-bold hover:bg-brand-blue transition-colors shadow-sm" onclick="addManualDestination()">追加</button>
                                     <button onclick="cancelEditDest()" id="btnCancelDest" class="hidden bg-slate-100 text-slate-500 font-bold py-2 px-3 rounded-lg text-xs hover:bg-slate-200 transition">取消</button>
                                 </div>
                             </div>
@@ -271,47 +289,187 @@
         <div class="bg-white w-full sm:max-w-xl rounded-t-3xl sm:rounded-3xl shadow-2xl h-[85vh] sm:h-auto sm:max-h-[80vh] flex flex-col animate-slide-up border border-brand-sand">
             <div class="p-4 border-b border-brand-sand/30 flex justify-between items-center bg-brand-beige rounded-t-3xl sticky top-0 z-10">
                 <h3 class="font-bold text-lg text-brand-blue flex items-center gap-2"><i class="fas fa-heart text-pink-400"></i> ふたりの希望条件</h3>
-                <button onclick="closeConditionModal()" class="w-8 h-8 rounded-full bg-white border border-brand-sand/50 text-brand-blue-light hover:bg-brand-sand/30 transition flex items-center justify-center"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="p-5 overflow-y-auto flex-1 bg-white" id="conditionModeView">
-                <div class="flex mb-4 bg-slate-100 p-1 rounded-lg">
-                    <button onclick="switchConditionTab('view')" id="tabView" class="flex-1 py-1.5 rounded-md text-sm font-bold bg-white shadow text-brand-blue transition">希望条件の確認</button>
-                    <button onclick="switchConditionTab('edit')" id="tabEdit" class="flex-1 py-1.5 rounded-md text-sm font-bold text-slate-400 transition">編集する</button>
-                </div>
-
-	<div id="conditionViewArea" class="space-y-4">
-    	<div class="bg-green-50 p-3 rounded-xl border border-green-100 mb-4">
-        	<h4 class="text-sm font-bold text-green-700 mb-2 text-center">共通の希望</h4>
-        	<div id="viewListCommon" class="text-sm space-y-1 text-slate-600"></div>
-    	</div>
-    
-    	<div class="grid grid-cols-2 gap-4">
-        	<div class="bg-blue-50 p-3 rounded-xl border border-blue-100 min-h-[150px]">
-            	<h4 class="text-sm font-bold text-blue-600 mb-2 text-center">Aさんの希望</h4>
-            	<div id="viewListA" class="text-sm space-y-1 text-slate-600"></div>
-        	</div>
-        	<div class="bg-pink-50 p-3 rounded-xl border border-pink-100 min-h-[150px]">
-            	<h4 class="text-sm font-bold text-pink-500 mb-2 text-center">Bさんの希望</h4>
-            	<div id="viewListB" class="text-sm space-y-1 text-slate-600"></div>
-       	 </div>
-    </div>
-</div>
-
-<div id="conditionEditArea" class="hidden space-y-4">
-    <div class="input-group">
-        <label class="text-black">ふたり共通の希望 (1行に1つ)</label>
-        <textarea id="condCommon" rows="3" class="bg-green-50/30 border-green-100 focus:border-green-300" placeholder="家賃8万円以内&#13;&#10;バストイレ別"></textarea>
-    </div>
-    
-    <div class="grid grid-cols-2 gap-4">
-        <div class="input-group"><label class="text-blue-500">Aさん (1行に1つ)</label><textarea id="condA" rows="5" class="bg-blue-50/30 border-blue-100 focus:border-blue-300" placeholder="2階以上"></textarea></div>
-        <div class="input-group"><label class="text-pink-500">Bさん (1行に1つ)</label><textarea id="condB" rows="5" class="bg-pink-50/30 border-pink-100 focus:border-pink-300" placeholder="オートロック必須"></textarea></div>
-    </div>
-    <button onclick="saveConditions()" class="w-full py-3 bg-brand-accent text-white font-bold rounded-xl shadow-lg hover:bg-orange-400 transition text-sm">条件を保存する</button>
-</div>
-            </div>
+                 <button onclick="closeConditionModal()" class="text-brand-blue-light hover:text-brand-blue transition">
+            <i class="fas fa-times text-xl"></i>
+          </button>
         </div>
+
+        <div class="p-5 flex-1 overflow-y-auto custom-scrollbar space-y-6 bg-gray-50/50">
+          
+          <p class="text-xs text-gray-500 text-center bg-white py-2 rounded-full shadow-sm sticky top-0 z-10 border border-gray-100">
+            条件が一致すると中央の <i class="fas fa-handshake text-yellow-500 mx-1"></i> が点灯します
+          </p>
+
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 space-y-4">
+            <h4 class="font-bold text-gray-700 border-b pb-2 text-sm"><i class="fas fa-home text-gray-400 mr-1"></i> 基本条件</h4>
+
+            <div class="flex justify-between items-center gap-2">
+              <div class="flex-1 bg-blue-50/50 p-2 rounded-lg flex items-center justify-between border border-blue-100">
+                <span class="text-blue-500 text-xs font-bold px-1">Aさん</span>
+                <div><input type="number" id="cond_rent_a" class="w-16 p-1.5 border border-white rounded text-right text-sm focus:border-blue-300 outline-none" placeholder="8"> <span class="text-xs text-gray-500">万円以下</span></div>
+              </div>
+              <div class="w-16 text-center text-xs font-bold text-gray-600 leading-tight">家賃<br><span class="text-[10px] font-normal text-gray-400">(管込)</span></div>
+              <div class="flex-1 bg-pink-50/50 p-2 rounded-lg flex items-center justify-between border border-pink-100">
+                <div><input type="number" id="cond_rent_b" class="w-16 p-1.5 border border-white rounded text-right text-sm focus:border-pink-300 outline-none" placeholder="8"> <span class="text-xs text-gray-500">万円以下</span></div>
+                <span class="text-pink-500 text-xs font-bold px-1">Bさん</span>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-start gap-2 border-t pt-4">
+              <div class="flex-1 bg-blue-50/50 p-2 rounded-lg text-xs flex flex-col gap-2 border border-blue-100">
+                <label class="flex items-center cursor-pointer text-gray-600 hover:text-blue-600"><input type="checkbox" id="cond_struct_a_wood" value="木造" class="mr-2 rounded text-blue-500 border-gray-300">木造</label>
+                <label class="flex items-center cursor-pointer text-gray-600 hover:text-blue-600"><input type="checkbox" id="cond_struct_a_steel" value="鉄骨" class="mr-2 rounded text-blue-500 border-gray-300">鉄骨造</label>
+                <label class="flex items-center cursor-pointer text-gray-600 hover:text-blue-600"><input type="checkbox" id="cond_struct_a_rc" value="RC" class="mr-2 rounded text-blue-500 border-gray-300">RC・SRC</label>
+              </div>
+              <div class="w-16 text-center text-xs font-bold text-gray-600 pt-2">構造<br><span class="text-[10px] font-normal text-gray-400">(複数可)</span></div>
+              <div class="flex-1 bg-pink-50/50 p-2 rounded-lg text-xs flex flex-col gap-2 items-end border border-pink-100">
+                <label class="flex items-center flex-row-reverse cursor-pointer text-gray-600 hover:text-pink-600"><input type="checkbox" id="cond_struct_b_wood" value="木造" class="ml-2 rounded text-pink-500 border-gray-300">木造</label>
+                <label class="flex items-center flex-row-reverse cursor-pointer text-gray-600 hover:text-pink-600"><input type="checkbox" id="cond_struct_b_steel" value="鉄骨" class="ml-2 rounded text-pink-500 border-gray-300">鉄骨造</label>
+                <label class="flex items-center flex-row-reverse cursor-pointer text-gray-600 hover:text-pink-600"><input type="checkbox" id="cond_struct_b_rc" value="RC" class="ml-2 rounded text-pink-500 border-gray-300">RC・SRC</label>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center gap-2 border-t pt-4">
+              <div class="flex-1 bg-blue-50/50 p-2 rounded-lg flex justify-end border border-blue-100">
+                <div><input type="number" id="cond_age_a" class="w-12 p-1.5 border border-white rounded text-right text-sm focus:border-blue-300 outline-none" placeholder="10"> <span class="text-xs text-gray-500">年以下</span></div>
+              </div>
+              <div class="w-16 text-center text-xs font-bold text-gray-600">築年数</div>
+              <div class="flex-1 bg-pink-50/50 p-2 rounded-lg flex justify-start border border-pink-100">
+                <div><input type="number" id="cond_age_b" class="w-12 p-1.5 border border-white rounded text-right text-sm focus:border-pink-300 outline-none" placeholder="10"> <span class="text-xs text-gray-500">年以下</span></div>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center gap-2 border-t pt-4">
+              <div class="flex-1 bg-blue-50/50 p-2 rounded-lg flex justify-end border border-blue-100">
+                <div><input type="number" id="cond_size_a" class="w-12 p-1.5 border border-white rounded text-right text-sm focus:border-blue-300 outline-none" placeholder="30"> <span class="text-xs text-gray-500">㎡以上</span></div>
+              </div>
+              <div class="w-16 text-center text-xs font-bold text-gray-600">広さ</div>
+              <div class="flex-1 bg-pink-50/50 p-2 rounded-lg flex justify-start border border-pink-100">
+                <div><input type="number" id="cond_size_b" class="w-12 p-1.5 border border-white rounded text-right text-sm focus:border-pink-300 outline-none" placeholder="30"> <span class="text-xs text-gray-500">㎡以上</span></div>
+              </div>
+            </div>
+
+            <div class="flex justify-between items-center gap-2 border-t pt-4">
+              <div class="flex-1 bg-blue-50/50 p-2 rounded-lg flex justify-end border border-blue-100">
+                <div><span class="text-xs text-gray-500">徒歩</span> <input type="number" id="cond_walk_a" class="w-12 p-1.5 border border-white rounded text-right text-sm focus:border-blue-300 outline-none" placeholder="10"> <span class="text-xs text-gray-500">分以内</span></div>
+              </div>
+              <div class="w-16 text-center text-xs font-bold text-gray-600">駅距離</div>
+              <div class="flex-1 bg-pink-50/50 p-2 rounded-lg flex justify-start border border-pink-100">
+                <div><span class="text-xs text-gray-500">徒歩</span> <input type="number" id="cond_walk_b" class="w-12 p-1.5 border border-white rounded text-right text-sm focus:border-pink-300 outline-none" placeholder="10"> <span class="text-xs text-gray-500">分以内</span></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 space-y-4">
+            <h4 class="font-bold text-gray-700 border-b pb-2 text-sm"><i class="fas fa-star text-yellow-400 mr-1"></i> 設備・こだわり条件</h4>
+            <div id="featuresList" class="space-y-3">
+              </div>
+          </div>
+
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4 space-y-4">
+            <h4 class="font-bold text-gray-700 border-b pb-2 text-sm"><i class="fas fa-comment-dots text-gray-400 mr-1"></i> 自由記述（その他希望）</h4>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="text-blue-500 text-xs font-bold flex items-center gap-1 mb-1"><i class="fas fa-user"></i> Aさん</label>
+                <textarea id="cond_free_a" rows="3" class="w-full border rounded-xl p-3 text-sm bg-blue-50/30 border-blue-100 focus:bg-white focus:ring-2 focus:ring-blue-300 outline-none transition custom-scrollbar" placeholder="どうしても譲れない条件など..."></textarea>
+              </div>
+              <div>
+                <label class="text-pink-500 text-xs font-bold flex items-center gap-1 mb-1"><i class="fas fa-user"></i> Bさん</label>
+                <textarea id="cond_free_b" rows="3" class="w-full border rounded-xl p-3 text-sm bg-pink-50/30 border-pink-100 focus:bg-white focus:ring-2 focus:ring-pink-300 outline-none transition custom-scrollbar" placeholder="どうしても譲れない条件など..."></textarea>
+              </div>
+            </div>
+          </div>
+
+        </div> <div class="p-4 bg-white border-t shrink-0"> 
+          <button onclick="saveConditions()" class="w-full py-4 bg-brand-blue hover:bg-[#355269] text-white font-bold rounded-xl shadow-md transition-all active:scale-95">
+            条件を保存する
+          </button>
+        </div>
+
+      </div>
     </div>
+
+  <script>
+    // 設備リストのマスターデータ
+    const features = [
+      "バストイレ別",
+      "2階以上",
+      "オートロック",
+      "室内洗濯機置場",
+      "独立洗面台",
+      "追焚機能",
+      "浴室乾燥機",
+      "宅配ボックス",
+      "都市ガス",
+      "南向き"
+    ];
+
+    const modal = document.getElementById('conditionModal');
+    const featuresList = document.getElementById('featuresList');
+
+    // 設備条件のHTMLを動的に生成する関数
+    function renderFeatures() {
+      featuresList.innerHTML = features.map((feature, index) => `
+        <div class="flex justify-between items-center gap-2 border-b border-gray-100 pb-2 last:border-0 last:pb-0">
+          <div class="flex-1 flex justify-end">
+            <label class="cursor-pointer flex items-center gap-2 group">
+              <span class="text-xs text-gray-500 group-hover:text-blue-500 transition">希望する</span>
+              <input type="checkbox" id="feature_a_${index}" onchange="checkMatch(${index})" class="w-4 h-4 text-blue-600 rounded border-gray-300 focus:ring-blue-500 cursor-pointer">
+            </label>
+          </div>
+          <div class="w-24 text-center text-[11px] font-bold text-gray-600 leading-tight">
+            ${feature}<br>
+            <i id="handshake_${index}" class="fas fa-handshake text-gray-200 mt-1 transition-colors duration-300"></i>
+          </div>
+          <div class="flex-1 flex justify-start">
+            <label class="cursor-pointer flex items-center flex-row-reverse gap-2 group">
+              <span class="text-xs text-gray-500 group-hover:text-pink-500 transition">希望する</span>
+              <input type="checkbox" id="feature_b_${index}" onchange="checkMatch(${index})" class="w-4 h-4 text-pink-600 rounded border-gray-300 focus:ring-pink-500 cursor-pointer">
+            </label>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // AさんとBさんが両方チェックしたか判定し、握手アイコンを光らせる関数
+    function checkMatch(index) {
+      const isCheckedA = document.getElementById(`feature_a_${index}`).checked;
+      const isCheckedB = document.getElementById(`feature_b_${index}`).checked;
+      const icon = document.getElementById(`handshake_${index}`);
+
+      if (isCheckedA && isCheckedB) {
+        icon.classList.remove('text-gray-200');
+        icon.classList.add('text-yellow-500');
+      } else {
+        icon.classList.remove('text-yellow-500');
+        icon.classList.add('text-gray-200');
+      }
+    }
+
+    function openConditionModal() {
+      modal.classList.remove('hidden');
+    }
+
+    function closeConditionModal() {
+      modal.classList.add('hidden');
+    }
+
+    function saveConditions() {
+      alert('条件を保存しました！'); 
+      closeConditionModal();
+    }
+
+    modal.addEventListener('click', function(event) {
+      if (event.target === modal) {
+        closeConditionModal();
+      }
+    });
+
+    // 画面読み込み時に設備リストを生成
+    window.onload = () => {
+      renderFeatures();
+    };
+  </script>
 
     <div id="filterModal" class="fixed inset-0 bg-brand-blue/20 backdrop-blur-sm hidden z-50 flex items-center justify-center p-4">
         <div class="bg-white w-full max-w-sm rounded-2xl shadow-xl border border-brand-sand flex flex-col max-h-[80vh]">
@@ -624,7 +782,6 @@
 
         function saveData() {
             const name = document.getElementById('name').value;
-            if(!name) return alert('物件名は必須です');
             const data = {
                 name, address: document.getElementById('address').value, rent: document.getElementById('rent').value, adminFee: document.getElementById('adminFee').value,
                 layout: document.getElementById('layout').value, size: document.getElementById('size').value, floor: document.getElementById('floor').value,
@@ -704,41 +861,90 @@
         }
 
         // ★ 目的地の追加・更新
-        function addDestination() {
-            const idVal = document.getElementById('editDestId').value;
-            const name = document.getElementById('newDestName').value;
-            const address = document.getElementById('newDestAddress').value;
-            if(!name || !address) return alert('名称と住所を入力してください');
-            
-            if (idVal) {
-                const idx = destinations.findIndex(d => d.id == idVal);
-                if (idx > -1) { destinations[idx].name = name; destinations[idx].address = address; }
-            } else {
-                destinations.push({ id: Date.now(), name, address });
-            }
-            cancelEditDest();
-            saveDestinations();
-        }
+        function addManualDestination() {
+    const val = document.getElementById('manual-dest-input').value.trim();
+    if (!val) return showMsg('dest-msg2', '目的地を入力してください');
+    if (destinations.includes(val)) return showMsg('dest-msg2', '既に登録されています');
+    
+    destinations.push(val);
+    document.getElementById('manual-dest-input').value = '';
+    showMsg('dest-msg2', `「${val}」を追加しました！`, true);
+    saveData();
+    setTimeout(() => clearMsg('dest-msg2'), 3000);
+}
 
-        function editDestination(id) {
-            const d = destinations.find(x => x.id == id);
-            if (!d) return;
-            document.getElementById('editDestId').value = d.id;
-            document.getElementById('newDestName').value = d.name;
-            document.getElementById('newDestAddress').value = d.address;
-            document.getElementById('destFormTitle').innerHTML = '<span class="text-brand-accent"><i class="fas fa-pen mr-1"></i>目的地の編集</span>';
-            document.getElementById('btnSaveDest').textContent = '更新する';
-            document.getElementById('btnCancelDest').classList.remove('hidden');
-        }
+window.showSuggestions = function(data) {
+    const list = document.getElementById('suggestion-list');
+    const input = document.getElementById('station-input');
+    list.innerHTML = '';
+    if (data.response && data.response.station) {
+        const uniqueStations = [...new Set(data.response.station.map(s => s.name))];
+        uniqueStations.forEach(name => {
+            const li = document.createElement('li');
+            li.className = 'px-4 py-3 hover:bg-brand-beige cursor-pointer border-b border-brand-sand last:border-none text-sm';
+            li.textContent = `${name}駅`;
+            li.onclick = () => {
+                const target = `${name}駅`;
+                if (destinations.includes(target)) {
+                    showMsg('dest-msg1', '既に登録されています');
+                } else {
+                    destinations.push(target);
+                    saveData();
+                    showMsg('dest-msg1', `「${target}」を追加しました！`, true);
+                    setTimeout(() => clearMsg('dest-msg1'), 3000);
+                }
+                input.value = '';
+                list.classList.add('hidden');
+            };
+            list.appendChild(li);
+        });
+        list.classList.remove('hidden');
+    }
+};
 
-        function cancelEditDest() {
-            document.getElementById('editDestId').value = '';
-            document.getElementById('newDestName').value = '';
-            document.getElementById('newDestAddress').value = '';
-            document.getElementById('destFormTitle').textContent = '新規追加';
-            document.getElementById('btnSaveDest').textContent = '追加する';
-            document.getElementById('btnCancelDest').classList.add('hidden');
-        }
+let debounceTimer;
+document.getElementById('station-input').addEventListener('input', function() {
+    const kw = this.value.trim();
+    const list = document.getElementById('suggestion-list');
+    if (kw.length < 1) return list.classList.add('hidden');
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+        const old = document.getElementById('jsonp-script');
+        if (old) old.remove();
+        const script = document.createElement('script');
+        script.id = 'jsonp-script';
+        script.src = `https://express.heartrails.com/api/json?method=getStations&name=${encodeURIComponent(kw)}&callback=showSuggestions`;
+        document.body.appendChild(script);
+    }, 300);
+});
+
+function swapLocations() {
+    const fromVal = document.getElementById('select-from').value;
+    const toVal = document.getElementById('select-to').value;
+    isSwapped = !isSwapped;
+    updateUI();
+    document.getElementById('select-from').value = toVal;
+    document.getElementById('select-to').value = fromVal;
+}
+
+function openYahooTransit(customFrom, customTo) {
+    let fromVal = customFrom || document.getElementById('select-from').value;
+    let toVal = customTo || document.getElementById('select-to').value;
+    if (!fromVal || !toVal) return showMsg('route-msg', '出発地と目的地を選択してください');
+    window.open(`https://transit.yahoo.co.jp/search/result?from=${encodeURIComponent(fromVal)}&to=${encodeURIComponent(toVal)}`, '_blank');
+}
+
+function saveRouteToCard() {
+    const fromVal = document.getElementById('select-from').value;
+    const toVal = document.getElementById('select-to').value;
+    if (!fromVal || !toVal) return showMsg('route-msg', '選択してください');
+    if (savedRoutes.some(r => r.from === fromVal && r.to === toVal)) return showMsg('route-msg', '保存済みです');
+    
+    savedRoutes.push({ from: fromVal, to: toVal });
+    saveData();
+    showMsg('route-msg', '保存しました！', true);
+    setTimeout(() => clearMsg('route-msg'), 3000);
+}
 
         function deleteDestination(id) {
             if(!confirm('この目的地を削除しますか？')) return;
@@ -772,13 +978,6 @@
  	   window.open(url, '_blank');
 	}
     </script>
-<div class="search-container">
-    <label for="station-input">目的地（駅名）:</label>
-    <input type="text" id="station-input" list="station-list" placeholder="例：新宿" autocomplete="off">
-    <datalist id="station-list"></datalist>
-    
-    <button id="search-btn">Yahoo!で経路検索</button>
-</div>
 
 <script>
     const input = document.getElementById('station-input');
@@ -822,6 +1021,7 @@
         if (!to) return alert("駅名を入力してください");
         window.open(`https://transit.yahoo.co.jp/search/result?from=東京&to=${encodeURIComponent(to)}`, '_blank');
     });
+
 </script>
 </body>
 </html>
