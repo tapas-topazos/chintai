@@ -84,7 +84,7 @@
         .btn-cond.active-must { background: #fee2e2; color: #ef4444; border-color: #fca5a5; }
         .btn-cond.active-ideal { background: #fef9c3; color: #ca8a04; border-color: #fde047; }
 
-        .station-tag { background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 6px; display: inline-flex; align-items: center; gap: 4px; font-weight: bold; font-size: 12px; margin: 2px; }
+        .station-tag { background: #e0f2fe; color: #0369a1; padding: 6px 10px; border-radius: 8px; display: flex; align-items: center; gap: 8px; font-weight: bold; font-size: 12px; margin: 2px; border: 1px solid #bae6fd; }
     </style>
 </head>
 <body>
@@ -225,8 +225,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <div id="dest-list" class="space-y-2 max-h-40 overflow-y-auto pt-2 border-t border-brand-sand/20">
-                                </div>
+                            <div id="dest-list" class="space-y-2 max-h-40 overflow-y-auto pt-2 border-t border-brand-sand/20"></div>
                         </div>
                     </div>
                     
@@ -257,14 +256,24 @@
                         <div class="flex-1 text-center py-2 bg-pink-100 rounded-lg text-pink-600 font-bold text-sm cond-user-b-label">Bさん</div>
                     </div>
 
-                    <div class="flex justify-between items-start gap-2 pt-2">
-                      <div class="flex-1 bg-blue-50/50 p-2 rounded-lg text-xs flex flex-col gap-2 border border-blue-100">
+                    <div class="flex justify-between items-center gap-2 pt-2">
+                      <div class="flex-1 bg-blue-50/50 p-2 rounded-lg flex items-center justify-end border border-blue-100">
+                        <div><input type="number" id="cond_rent_a" class="w-16 p-1.5 border border-white rounded text-right text-sm focus:border-blue-300 outline-none" placeholder="8"> <span class="text-xs text-gray-500">万円以下</span></div>
+                      </div>
+                      <div class="w-20 text-center text-xs font-bold text-gray-600 leading-tight">家賃<br><span class="text-[10px] font-normal text-gray-400">(管込)</span></div>
+                      <div class="flex-1 bg-pink-50/50 p-2 rounded-lg flex items-center justify-start border border-pink-100">
+                        <div><input type="number" id="cond_rent_b" class="w-16 p-1.5 border border-white rounded text-right text-sm focus:border-pink-300 outline-none" placeholder="8"> <span class="text-xs text-gray-500">万円以下</span></div>
+                      </div>
+                    </div>
+
+                    <div class="flex justify-between items-start gap-2 border-t border-gray-100 pt-4">
+                      <div class="flex-1 bg-blue-50/50 p-2 rounded-lg text-xs flex flex-col gap-2 border border-blue-100 text-left">
                         <label class="flex items-center cursor-pointer text-gray-600 hover:text-blue-600"><input type="checkbox" id="cond_struct_a_wood" value="木造" class="mr-2 rounded text-blue-500 border-gray-300">木造</label>
                         <label class="flex items-center cursor-pointer text-gray-600 hover:text-blue-600"><input type="checkbox" id="cond_struct_a_steel" value="鉄骨" class="mr-2 rounded text-blue-500 border-gray-300">鉄骨造</label>
                         <label class="flex items-center cursor-pointer text-gray-600 hover:text-blue-600"><input type="checkbox" id="cond_struct_a_rc" value="RC" class="mr-2 rounded text-blue-500 border-gray-300">RC・SRC</label>
                       </div>
-                      <div class="w-16 text-center text-xs font-bold text-gray-600 pt-2">構造<br><span class="text-[10px] font-normal text-gray-400">(複数可)</span></div>
-                      <div class="flex-1 bg-pink-50/50 p-2 rounded-lg text-xs flex flex-col gap-2 items-end border border-pink-100">
+                      <div class="w-20 text-center text-xs font-bold text-gray-600 pt-2">構造</div>
+                      <div class="flex-1 bg-pink-50/50 p-2 rounded-lg text-xs flex flex-col gap-2 items-end border border-pink-100 text-right">
                         <label class="flex items-center flex-row-reverse cursor-pointer text-gray-600 hover:text-pink-600"><input type="checkbox" id="cond_struct_b_wood" value="木造" class="ml-2 rounded text-pink-500 border-gray-300">木造</label>
                         <label class="flex items-center flex-row-reverse cursor-pointer text-gray-600 hover:text-pink-600"><input type="checkbox" id="cond_struct_b_steel" value="鉄骨" class="ml-2 rounded text-pink-500 border-gray-300">鉄骨造</label>
                         <label class="flex items-center flex-row-reverse cursor-pointer text-gray-600 hover:text-pink-600"><input type="checkbox" id="cond_struct_b_rc" value="RC" class="ml-2 rounded text-pink-500 border-gray-300">RC・SRC</label>
@@ -275,7 +284,7 @@
                       <div class="flex-1 bg-blue-50/50 p-2 rounded-lg flex justify-end border border-blue-100">
                         <div><input type="number" id="cond_age_a" class="w-12 p-1.5 border border-white rounded text-right text-sm focus:border-blue-300 outline-none" placeholder="10"> <span class="text-xs text-gray-500">年以下</span></div>
                       </div>
-                      <div class="w-16 text-center text-xs font-bold text-gray-600">築年数</div>
+                      <div class="w-20 text-center text-xs font-bold text-gray-600">築年数</div>
                       <div class="flex-1 bg-pink-50/50 p-2 rounded-lg flex justify-start border border-pink-100">
                         <div><input type="number" id="cond_age_b" class="w-12 p-1.5 border border-white rounded text-right text-sm focus:border-pink-300 outline-none" placeholder="10"> <span class="text-xs text-gray-500">年以下</span></div>
                       </div>
@@ -285,7 +294,7 @@
                       <div class="flex-1 bg-blue-50/50 p-2 rounded-lg flex justify-end border border-blue-100">
                         <div><input type="number" id="cond_size_a" class="w-12 p-1.5 border border-white rounded text-right text-sm focus:border-blue-300 outline-none" placeholder="30"> <span class="text-xs text-gray-500">㎡以上</span></div>
                       </div>
-                      <div class="w-16 text-center text-xs font-bold text-gray-600">広さ</div>
+                      <div class="w-20 text-center text-xs font-bold text-gray-600">広さ</div>
                       <div class="flex-1 bg-pink-50/50 p-2 rounded-lg flex justify-start border border-pink-100">
                         <div><input type="number" id="cond_size_b" class="w-12 p-1.5 border border-white rounded text-right text-sm focus:border-pink-300 outline-none" placeholder="30"> <span class="text-xs text-gray-500">㎡以上</span></div>
                       </div>
@@ -295,26 +304,26 @@
                       <div class="flex-1 bg-blue-50/50 p-2 rounded-lg flex justify-end border border-blue-100">
                         <div><span class="text-xs text-gray-500">徒歩</span> <input type="number" id="cond_walk_a" class="w-12 p-1.5 border border-white rounded text-right text-sm focus:border-blue-300 outline-none" placeholder="10"> <span class="text-xs text-gray-500">分以内</span></div>
                       </div>
-                      <div class="w-16 text-center text-xs font-bold text-gray-600">駅距離</div>
+                      <div class="w-20 text-center text-xs font-bold text-gray-600 leading-tight">最寄駅からの<br>距離</div>
                       <div class="flex-1 bg-pink-50/50 p-2 rounded-lg flex justify-start border border-pink-100">
                         <div><span class="text-xs text-gray-500">徒歩</span> <input type="number" id="cond_walk_b" class="w-12 p-1.5 border border-white rounded text-right text-sm focus:border-pink-300 outline-none" placeholder="10"> <span class="text-xs text-gray-500">分以内</span></div>
                       </div>
                     </div>
 
                     <div class="flex justify-between items-center gap-2 border-t border-gray-100 pt-4">
-                      <div class="flex-1 bg-blue-50/50 p-2 rounded-lg flex items-center justify-end border border-blue-100">
-                        <div><input type="number" id="cond_rent_a" class="w-16 p-1.5 border border-white rounded text-right text-sm focus:border-blue-300 outline-none" placeholder="8"> <span class="text-xs text-gray-500">万円以下</span></div>
-                      </div>
-                      <div class="w-16 text-center text-xs font-bold text-gray-600 leading-tight">家賃<br><span class="text-[10px] font-normal text-gray-400">(管理費込み)</span></div>
-                      <div class="flex-1 bg-pink-50/50 p-2 rounded-lg flex items-center justify-start border border-pink-100">
-                        <div><input type="number" id="cond_rent_b" class="w-16 p-1.5 border border-white rounded text-right text-sm focus:border-pink-300 outline-none" placeholder="8"> <span class="text-xs text-gray-500">万円以下</span></div>
-                      </div>
+                        <div class="flex-1 bg-blue-50/50 p-2 rounded-lg flex justify-end border border-blue-100">
+                          <div><input type="number" id="cond_work_a" class="w-12 p-1.5 border border-white rounded text-right text-sm focus:border-blue-300 outline-none" placeholder="30"> <span class="text-xs text-gray-500">分以内</span></div>
+                        </div>
+                        <div class="w-20 text-center text-xs font-bold text-gray-600 leading-tight">職場までの<br>時間</div>
+                        <div class="flex-1 bg-pink-50/50 p-2 rounded-lg flex justify-start border border-pink-100">
+                          <div><input type="number" id="cond_work_b" class="w-12 p-1.5 border border-white rounded text-right text-sm focus:border-pink-300 outline-none" placeholder="30"> <span class="text-xs text-gray-500">分以内</span></div>
+                        </div>
                     </div>
                 </div>
 
                 <div class="bg-white rounded-2xl shadow-sm p-4 border border-brand-sand/30">
                     <h4 class="font-bold text-brand-blue mb-4 text-sm"><i class="fas fa-star text-yellow-400 mr-1"></i>設備・こだわり条件</h4>
-                    <p class="text-[10px] text-gray-400 mb-3 border-b pb-2">「必須」か「理想」を選択してください。両方の希望が合致すると🤝🏻が点灯します。</p>
+                    <p class="text-[10px] text-gray-400 mb-3 border-b pb-2">「必須」か「理想」を選択してください。<b>両方が「必須」を選択した時だけ</b>🤝🏻が表示されます。</p>
                     <div id="featuresContainer" class="space-y-3"></div>
                 </div>
 
@@ -368,12 +377,21 @@
                 <h4 class="text-xs font-bold text-brand-blue-light uppercase mb-3 px-1">基本データ</h4>
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div class="input-group col-span-2 relative">
-                        <label>最寄駅 (検索して追加 / 複数可)</label>
-                        <input type="text" id="station-search-input" placeholder="例: 渋谷" class="mb-2" autocomplete="off">
-                        <ul id="station-suggestion-list" class="absolute z-50 w-full mt-[-8px] bg-white border border-brand-sand rounded-xl shadow-xl max-h-[150px] overflow-y-auto hidden"></ul>
-                        <div id="selected-stations-container" class="flex flex-wrap gap-1 p-2 bg-white border border-brand-sand/30 rounded-xl min-h-[44px]"></div>
+                        <label>最寄り駅と徒歩分数 (入力して追加)</label>
+                        <div class="flex gap-2 mb-2 items-stretch">
+                            <div class="relative flex-1">
+                                <input type="text" id="station-search-input" placeholder="例: 渋谷" autocomplete="off" class="w-full">
+                                <ul id="station-suggestion-list" class="absolute z-50 w-full mt-1 bg-white border border-brand-sand rounded-xl shadow-xl max-h-[150px] overflow-y-auto hidden"></ul>
+                            </div>
+                            <div class="flex items-center gap-1 w-24 shrink-0">
+                                <input type="number" id="station-walk-input" placeholder="5" min="0" class="text-right w-full">
+                                <span class="text-xs text-brand-blue-light font-bold">分</span>
+                            </div>
+                            <button type="button" onclick="addStationWithWalkBtn()" class="bg-brand-blue text-white px-4 rounded-xl text-xs font-bold shadow hover:bg-[#355269] transition shrink-0 whitespace-nowrap">追加</button>
+                        </div>
+                        <div id="selected-stations-container" class="flex flex-col gap-2 p-3 bg-white border border-brand-sand/30 rounded-xl min-h-[44px]"></div>
                     </div>
-                    <div class="input-group"><label>駅徒歩 (分)</label><input type="number" min="0" id="walk" placeholder="5"></div>                    
+                    
                     <div class="input-group"><label>構造</label><select id="structure"><option value="">選択</option><option value="鉄筋系">鉄筋系</option><option value="鉄骨系">鉄骨系</option><option value="木造">木造</option><option value="その他">その他</option></select></div>
                     <div class="input-group"><label>階数 (階)</label><input type="number" id="floor" placeholder="2"></div>
                     <div class="input-group"><label>採光面</label><select id="direction"><option value="">選択</option><option value="北">北</option><option value="北東">北東</option><option value="東">東</option><option value="南東">南東</option><option value="南">南</option><option value="南西">南西</option><option value="西">西</option><option value="北西">北西</option></select></div>
@@ -383,8 +401,7 @@
                 </div>
 
                 <h4 class="text-xs font-bold text-brand-blue-light uppercase mb-3 px-1">設備</h4>
-                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-6 checkbox-group grid grid-cols-2 gap-3" id="propertyFeaturesCheckboxes">
-                    </div>
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 mb-6 checkbox-group grid grid-cols-2 gap-3" id="propertyFeaturesCheckboxes"></div>
                 <div class="space-y-4">
                     <div class="input-group"><label>備考欄</label><textarea id="memo" rows="3" class="bg-brand-beige border-brand-sand/50"></textarea></div>
                     <div class="input-group col-span-2"><label>アクセス・想定路線 (メモ)</label><input type="text" id="route" placeholder="例: 職場まで乗換なし30分"></div>
@@ -414,16 +431,15 @@
             "駅徒歩10分以内", "2階以上", "バストイレ別", "追炊機能", 
             "浴室乾燥", "洗面所独立", "二口コンロ以上", "IHコンロ", 
             "オートロック", "シューズボックス", "宅配ボックス", "クローゼット", 
-            "都市ガス", "24時間ゴミ出し可", "駐車場あり", "インターネット無料", "ペット相談可"
+            "都市ガス", "24時間ゴミ出し可"
         ];
 
         let db = null, isOnline = false, properties = [], visibleIds = null;
         let conditions = { featuresA: {}, featuresB: {}, freeA: "", freeB: "" };
         let destinations = [];
         let savedRoutes = [];
-        let currentModalStations = []; // モーダル内で一時的に保持する駅リスト
+        let currentModalStations = []; 
 
-        // --- 名前のリサイズと保存 ---
         function resizeInput(input) {
             const hiddenSpan = document.createElement('span');
             hiddenSpan.style.fontFamily = getComputedStyle(input).fontFamily;
@@ -444,7 +460,6 @@
             localStorage.setItem('rental_userA', nameA);
             localStorage.setItem('rental_userB', nameB);
             
-            // 希望条件モーダルのラベルにも反映
             document.querySelectorAll('.cond-user-a-label').forEach(el => el.textContent = nameA);
             document.querySelectorAll('.cond-user-b-label').forEach(el => el.textContent = nameB);
             
@@ -452,7 +467,6 @@
             resizeInput(document.getElementById('userB'));
         }
 
-        // --- 起動と認証 ---
         function checkPassword() {
             if (document.getElementById('passwordInput').value === APP_PASSWORD) {
                 document.getElementById('authScreen').classList.add('hidden');
@@ -468,7 +482,6 @@
         }
 
         function initApp() {
-            // お名前の復元とサイズ調整
             const savedA = localStorage.getItem('rental_userA') || "Aさん";
             const savedB = localStorage.getItem('rental_userB') || "Bさん";
             document.getElementById('userA').value = savedA;
@@ -514,11 +527,9 @@
         function fallbackToLocal() {
             isOnline = false;
             properties = JSON.parse(localStorage.getItem('rental_local_v5')) || [];
-            
             let c = JSON.parse(localStorage.getItem('rental_conditions_v4'));
             if (!c || !c.featuresA) c = { featuresA: {}, featuresB: {}, freeA: "", freeB: "" };
             conditions = c;
-            
             destinations = JSON.parse(localStorage.getItem('rental_destinations_v2')) || [];
             savedRoutes = JSON.parse(localStorage.getItem('rental_routes_v2')) || [];
             render(); renderDestinations();
@@ -552,13 +563,10 @@
             document.getElementById('btn-' + mode).className = "bg-brand-blue text-white px-4 py-1.5 rounded-full text-xs font-bold transition shadow-sm flex items-center whitespace-nowrap";
         }
 
-        // --- 条件メモ機能 ---
         function openConditionModal() {
             renderFeatures();
             document.getElementById('cond_free_a').value = conditions.freeA || "";
             document.getElementById('cond_free_b').value = conditions.freeB || "";
-            
-            // 基本条件の展開
             document.getElementById('cond_rent_a').value = conditions.rentA || '';
             document.getElementById('cond_rent_b').value = conditions.rentB || '';
             document.getElementById('cond_age_a').value = conditions.ageA || '';
@@ -567,14 +575,14 @@
             document.getElementById('cond_size_b').value = conditions.sizeB || '';
             document.getElementById('cond_walk_a').value = conditions.walkA || '';
             document.getElementById('cond_walk_b').value = conditions.walkB || '';
-
+            document.getElementById('cond_work_a').value = conditions.workTimeA || ''; 
+            document.getElementById('cond_work_b').value = conditions.workTimeB || ''; 
             ['wood','steel','rc'].forEach(t => {
                 const valA = document.getElementById(`cond_struct_a_${t}`).value;
                 document.getElementById(`cond_struct_a_${t}`).checked = (conditions.structA||[]).includes(valA);
                 const valB = document.getElementById(`cond_struct_b_${t}`).value;
                 document.getElementById(`cond_struct_b_${t}`).checked = (conditions.structB||[]).includes(valB);
             });
-
             document.getElementById('conditionModal').classList.remove('hidden');
         }
         
@@ -589,21 +597,22 @@
                 const valA = (conditions.featuresA || {})[feat] || '';
                 const valB = (conditions.featuresB || {})[feat] || '';
                 const isMatch = (valA === 'must' && valB === 'must');
+                
                 return `
-                <div class="flex items-center justify-between gap-3 bg-white p-3 rounded-xl border border-gray-100 shadow-sm">
-                    <div class="flex-1 flex flex-col items-center gap-1 border-r border-gray-50">
-                        <span class="text-[9px] text-blue-400 font-bold uppercase truncate max-w-full px-1">${userA_name}</span>
+                <div class="flex items-center justify-between gap-2 bg-white p-3 rounded-xl border border-gray-100 shadow-sm overflow-hidden">
+                    <div class="flex-1 flex flex-col items-center gap-1 border-r border-gray-50 min-w-0">
+                        <span class="text-[9px] text-blue-400 font-bold uppercase truncate w-full text-center px-1">${userA_name}</span>
                         <div class="flex gap-1">
                             <button onclick="setFeat('A', '${feat}', 'must')" class="btn-cond ${valA==='must'?'active-must':''}">必須</button>
                             <button onclick="setFeat('A', '${feat}', 'ideal')" class="btn-cond ${valA==='ideal'?'active-ideal':''}">理想</button>
                         </div>
                     </div>
-                    <div class="w-24 text-center shrink-0">
-                        <div class="text-[11px] font-bold text-brand-blue">${feat}</div>
+                    <div class="flex-none px-2 text-center shrink-0 min-w-[80px]">
+                        <div class="text-[11px] font-bold text-brand-blue break-words">${feat}</div>
                         <div class="text-sm mt-0.5">${isMatch ? '🤝🏻' : ''}</div>
                     </div>
-                    <div class="flex-1 flex flex-col items-center gap-1 border-l border-gray-50">
-                        <span class="text-[9px] text-pink-400 font-bold uppercase truncate max-w-full px-1">${userB_name}</span>
+                    <div class="flex-1 flex flex-col items-center gap-1 border-l border-gray-50 min-w-0">
+                        <span class="text-[9px] text-pink-400 font-bold uppercase truncate w-full text-center px-1">${userB_name}</span>
                         <div class="flex gap-1">
                             <button onclick="setFeat('B', '${feat}', 'must')" class="btn-cond ${valB==='must'?'active-must':''}">必須</button>
                             <button onclick="setFeat('B', '${feat}', 'ideal')" class="btn-cond ${valB==='ideal'?'active-ideal':''}">理想</button>
@@ -624,8 +633,6 @@
         function saveConditions() {
             conditions.freeA = document.getElementById('cond_free_a').value;
             conditions.freeB = document.getElementById('cond_free_b').value;
-            
-            // 基本条件の保存
             conditions.rentA = document.getElementById('cond_rent_a').value;
             conditions.rentB = document.getElementById('cond_rent_b').value;
             conditions.ageA = document.getElementById('cond_age_a').value;
@@ -634,17 +641,16 @@
             conditions.sizeB = document.getElementById('cond_size_b').value;
             conditions.walkA = document.getElementById('cond_walk_a').value;
             conditions.walkB = document.getElementById('cond_walk_b').value;
-
+            conditions.workTimeA = document.getElementById('cond_work_a').value; 
+            conditions.workTimeB = document.getElementById('cond_work_b').value; 
             const getChecked = idPrefix => Array.from(document.querySelectorAll(`input[id^="${idPrefix}"]:checked`)).map(cb => cb.value);
             conditions.structA = getChecked('cond_struct_a_');
             conditions.structB = getChecked('cond_struct_b_');
-
             saveConditionsToStorage();
             alert("希望条件を保存しました");
             closeConditionModal();
         }
 
-        // --- 目的地の管理 ---
         function renderDestinations() {
             const area = document.getElementById('dest-list');
             area.innerHTML = '';
@@ -674,7 +680,6 @@
             const name = document.getElementById('manual-dest-name').value.trim();
             const address = document.getElementById('manual-dest-address').value.trim();
             if (!name) return alert('名称を入力してください');
-            
             const finalAddress = address || name;
             if (idVal) {
                 const idx = destinations.findIndex(d => d.id == idVal);
@@ -710,15 +715,12 @@
             saveDestinationsToStorage();
         }
 
-        // --- 物件モーダルの駅サジェスト機能 ---
         function initStationSearch(inputId, listId, isForPropertyModal = false) {
             const input = document.getElementById(inputId);
             const list = document.getElementById(listId);
-            
             input.addEventListener('input', function() {
                 const kw = this.value.trim();
                 if (kw.length < 1) return list.classList.add('hidden');
-                
                 clearTimeout(debounceTimer);
                 debounceTimer = setTimeout(async () => {
                     try {
@@ -734,17 +736,17 @@
                                 li.onclick = () => {
                                     const target = `${name}駅`;
                                     if (isForPropertyModal) {
-                                        addStationToModal(target);
+                                        input.value = target; // モーダルでは入力欄にセットするだけ
+                                        list.classList.add('hidden');
                                     } else {
-                                        // 目的地の管理用
                                         if (!destinations.some(d => d.name === target)) {
                                             destinations.push({ id: Date.now(), name: target, address: target });
                                             saveDestinationsToStorage();
                                             alert(`「${target}」を追加しました！`);
                                         }
+                                        input.value = ''; 
+                                        list.classList.add('hidden');
                                     }
-                                    input.value = '';
-                                    list.classList.add('hidden');
                                 };
                                 list.appendChild(li);
                             });
@@ -755,63 +757,77 @@
             });
         }
 
-        function addStationToModal(name) {
-            if (currentModalStations.includes(name)) return;
-            currentModalStations.push(name);
+        // 新しい駅追加関数
+        function addStationWithWalkBtn() {
+            const nameInput = document.getElementById('station-search-input');
+            const walkInput = document.getElementById('station-walk-input');
+            const name = nameInput.value.trim();
+            const walk = walkInput.value.trim();
+
+            if (!name) {
+                alert('駅名を入力してください');
+                return;
+            }
+
+            if (currentModalStations.some(s => s.name === name)) {
+                alert('その駅はすでに追加されています');
+                return;
+            }
+
+            currentModalStations.push({ name: name, walk: walk });
             renderModalStations();
+            
+            // 追加後に入力欄をリセット
+            nameInput.value = '';
+            walkInput.value = '';
         }
 
         function removeStationFromModal(name) {
-            currentModalStations = currentModalStations.filter(s => s !== name);
+            currentModalStations = currentModalStations.filter(s => s.name !== name);
             renderModalStations();
         }
 
         function renderModalStations() {
             const container = document.getElementById('selected-stations-container');
             container.innerHTML = currentModalStations.map(s => `
-                <span class="station-tag">
-                    ${s}
-                    <i class="fas fa-times cursor-pointer hover:text-red-500" onclick="removeStationFromModal('${s}')"></i>
-                </span>
+                <div class="station-tag flex items-center justify-between bg-white">
+                    <div class="flex items-center gap-2">
+                        <i class="fas fa-train text-brand-blue-light"></i>
+                        <span class="font-bold text-sm text-brand-blue">${s.name}</span>
+                    </div>
+                    <div class="flex items-center gap-2 ml-auto">
+                        <span class="text-sm font-bold text-brand-blue">${s.walk ? s.walk + '分' : '-'}</span>
+                        <i class="fas fa-times cursor-pointer text-gray-300 hover:text-red-500 ml-2 p-1" onclick="removeStationFromModal('${s.name}')"></i>
+                    </div>
+                </div>
             `).join('');
             if(currentModalStations.length === 0) {
-                container.innerHTML = '<span class="text-xs text-gray-400 p-1">未設定</span>';
+                container.innerHTML = '<span class="text-xs text-gray-400 p-1 text-center block w-full">追加された最寄り駅がここに表示されます</span>';
             }
         }
 
         let debounceTimer;
-        // マップ用駅サジェストの初期化
         document.addEventListener('DOMContentLoaded', () => {
-             // これは既存の目的地の管理用
              initStationSearch('station-input', 'suggestion-list', false);
-             // 物件登録用
              initStationSearch('station-search-input', 'station-suggestion-list', true);
         });
         
         document.addEventListener('click', (e) => {
             ['suggestion-list', 'station-suggestion-list'].forEach(id => {
                 const list = document.getElementById(id);
-                if (list && !list.contains(e.target) && !e.target.closest('input')) {
-                    list.classList.add('hidden');
-                }
+                if (list && !list.contains(e.target) && !e.target.closest('input')) list.classList.add('hidden');
             });
         });
 
-        // --- ルート保存 ---
         function updateMapSelects() {
             const routeStart = document.getElementById('routeStart');
             if(!routeStart) return;
             routeStart.innerHTML = '<option value="">物件を選択してください</option>';
-            properties.forEach(p => {
-                if(p.address) routeStart.innerHTML += `<option value="${p.address}">${p.name} (${p.address})</option>`;
-            });
-
+            properties.forEach(p => { if(p.address) routeStart.innerHTML += `<option value="${p.address}">${p.name} (${p.address})</option>`; });
             const routeEnd = document.getElementById('routeEnd');
             if(!routeEnd) return;
             routeEnd.innerHTML = '<option value="">目的地を選択してください</option>';
-            destinations.forEach(d => {
-                routeEnd.innerHTML += `<option value="${d.address}">${d.name}</option>`;
-            });
+            destinations.forEach(d => { routeEnd.innerHTML += `<option value="${d.address}">${d.name}</option>`; });
         }
 
         function calculateRoute() {
@@ -825,17 +841,11 @@
         function saveRouteToProperty() {
             const fromSelect = document.getElementById('routeStart');
             const toSelect = document.getElementById('routeEnd');
-            const from = fromSelect.value;
-            const to = toSelect.value;
+            const from = fromSelect.value, to = toSelect.value;
             if (!from || !to) return alert('出発地と目的地を選択してください');
-            
             const toName = toSelect.options[toSelect.selectedIndex].text;
-            
-            if (savedRoutes.some(r => r.from === from && r.to === to)) {
-                return alert('このルートは既に保存されています');
-            }
-            
-            savedRoutes.push({ from: from, to: to, toName: toName });
+            if (savedRoutes.some(r => r.from === from && r.to === to)) return alert('このルートは既に保存されています');
+            savedRoutes.push({ from, to, toName });
             saveRoutesToStorage();
             alert('物件カードにルートを保存しました！');
             render();
@@ -844,8 +854,7 @@
         function deleteRoute(from, to) {
             if(!confirm('このルートを削除しますか？')) return;
             savedRoutes = savedRoutes.filter(r => !(r.from === from && r.to === to));
-            saveRoutesToStorage();
-            render();
+            saveRoutesToStorage(); render();
         }
 
         function updateIframeMap(address) {
@@ -853,7 +862,6 @@
             document.getElementById('mapIframe').src = `https://maps.google.co.jp/maps?output=embed&q=${encodeURIComponent(address)}&t=m&z=15&hl=ja`;
         }
 
-        // --- フィルタリング ---
         function openFilterModal() {
             const listEl = document.getElementById('filterList');
             listEl.innerHTML = '';
@@ -876,32 +884,26 @@
             render(); closeFilterModal();
         }
 
-        // --- メインレンダリング ---
         function render() {
             const grid = document.getElementById('propertyGrid'), cHead = document.getElementById('compareHeader'), cBody = document.getElementById('compareBody');
             if(!grid) return;
             document.getElementById('countBadge').textContent = properties.length + '件';
-            
             document.getElementById('compareFilterArea').classList.toggle('hidden', properties.length === 0);
             if(properties.length === 0) visibleIds = null;
-
             grid.innerHTML = ''; cBody.innerHTML = '';
             while(cHead.children.length > 1) cHead.removeChild(cHead.lastChild);
-
             if(properties.length === 0) {
                 grid.innerHTML = `<div class="col-span-1 md:col-span-3 text-center py-20"><p class="text-brand-blue font-bold">物件が登録されていません</p></div>`; return;
             }
-
             const items = [
                 {k:'rent', l:'家賃', u:'万'}, {k:'adminFee', l:'管理費', u:'円', fmt: true},
                 {k:'totalCost', l:'月額合計', u:'円', fmt: true},
                 {k:'initial_cost', l:'敷/礼', u:''},
-                {k:'address', l:'住所'}, {k:'station', l:'最寄駅'}, {k:'walk', l:'駅徒歩', u:'分'},
+                {k:'address', l:'住所'}, {k:'station', l:'最寄駅'},
                 {k:'structure', l:'構造'}, {k:'floor', l:'階数', u:'階'},
                 {k:'direction', l:'方位'}, {k:'layout', l:'間取り'}, {k:'size', l:'広さ', u:'㎡'},
                 {k:'age_display', l:'築年数'}, {k:'features', l:'設備'}, {k:'memo', l:'備考'}
             ];
-
             const trs = {};
             items.forEach(item => {
                 const tr = document.createElement('tr');
@@ -909,7 +911,6 @@
                 trs[item.k] = tr; cBody.appendChild(tr);
             });
 
-            // ソート適用
             const sort = document.getElementById('sortSelect').value;
             let sortedProps = [...properties];
             if (sort === 'rent_asc') {
@@ -919,24 +920,27 @@
                     return costA - costB;
                 });
             }
-            if (sort === 'walk_asc') sortedProps.sort((a,b) => (parseInt(a.walk)||0) - (parseInt(b.walk)||0));
+            if (sort === 'walk_asc') {
+                sortedProps.sort((a,b) => {
+                    const getMinWalk = p => {
+                        const walks = (p.stations || []).map(s => parseInt(s.walk) || 999);
+                        return walks.length > 0 ? Math.min(...walks) : 999;
+                    };
+                    return getMinWalk(a) - getMinWalk(b);
+                });
+            }
             if (sort === 'age_asc') sortedProps.sort((a,b) => (parseInt(a.age)||0) - (parseInt(b.age)||0));
-
+            
             const targets = visibleIds ? sortedProps.filter(p => visibleIds.includes(p.id)) : sortedProps;
-
-            // 一覧ビューのカード描画
+            
             sortedProps.forEach(p => {
                 p.totalCost = (parseFloat(p.rent||0) * 10000) + parseInt(p.adminFee||0);
                 p.age_display = p.age ? `築${p.age}年` : '-';
                 p.initial_cost = `${p.deposit||'-'} / ${p.keyMoney||'-'}`;
                 
-                // 駅表示の正規化（互換性維持：配列でも文字列でも対応）
-                const stationArr = Array.isArray(p.stations) ? p.stations : (p.station ? [p.station] : []);
-                const stationText = stationArr.join('・') || '-';
+                const stationTags = (p.stations || []).map(s => `${s.name}(${s.walk||'-'}分)`).join('・') || '-';
 
                 const fTags = (p.features||[]).slice(0,3).map(f=>`<span class="bg-slate-100 text-slate-500 px-2 py-0.5 rounded text-[10px] border border-slate-200">${f}</span>`).join('');
-                
-                // ★ ルート表示の生成
                 const pRoutes = savedRoutes.filter(r => r.from === p.address);
                 const routeHtml = pRoutes.map(r => `
                     <div class="flex items-center gap-1 mt-2">
@@ -946,9 +950,9 @@
                         <button onclick="deleteRoute('${p.address}', '${r.to}'); event.stopPropagation();" class="text-gray-300 hover:text-red-400 px-2 py-1"><i class="fas fa-times"></i></button>
                     </div>
                 `).join('');
-
+                
                 if (visibleIds && !visibleIds.includes(p.id)) return; 
-
+                
                 const card = document.createElement('div');
                 card.className = 'card bg-white rounded-2xl border border-white shadow-sm cursor-pointer flex flex-col h-full relative group overflow-hidden';
                 card.onclick = e => { if(!e.target.closest('a') && !e.target.closest('button')) openModal(p.id); };
@@ -961,17 +965,15 @@
                             <div class="text-xs font-bold text-brand-accent mt-1 text-right">月額合計: ${formatNum(p.totalCost)}円</div>
                         </div>
                         <div class="grid grid-cols-2 gap-3 text-xs text-brand-blue/80 mb-4">
-                            <div class="flex items-center gap-2 col-span-2"><i class="fas fa-train text-brand-accent"></i><span class="truncate">${stationText}</span></div>
-                            <div class="flex items-center gap-2"><i class="fas fa-walking text-brand-accent"></i>${p.walk?p.walk+'分':'-'}</div>
+                            <div class="flex items-start gap-2 col-span-2"><i class="fas fa-train text-brand-accent mt-0.5"></i><span class="leading-snug">${stationTags}</span></div>
                             <div class="flex items-center gap-2"><i class="fas fa-building text-brand-accent"></i>${p.age_display}</div>
+                            <div class="flex items-center gap-2"><i class="fas fa-expand-arrows-alt text-brand-accent"></i>${p.size||'-'}㎡</div>
                             <div class="flex items-center gap-2 col-span-2"><i class="fas fa-map-marker-alt text-brand-accent"></i><span class="truncate">${p.address||'-'}</span></div>
                         </div>
                         ${fTags?`<div class="flex flex-wrap gap-1 mb-2">${fTags}</div>`:''}
-                        
                         <div class="border-t border-brand-sand/30 pt-2 mt-2">
                             ${routeHtml || '<p class="text-[10px] text-gray-300 text-center italic">保存されたルートなし</p>'}
                         </div>
-
                         <div class="mt-auto pt-4 border-t border-brand-sand/30 flex justify-between items-center">
                             ${p.url?`<a href="${p.url}" target="_blank" class="text-xs text-brand-blue font-bold hover:underline bg-brand-sand/20 px-3 py-1.5 rounded-full"><i class="fas fa-link"></i> サイト</a>`:'<span class="text-xs text-brand-sand">URLなし</span>'}
                             <button onclick="openModal(${p.id}); event.stopPropagation();" class="text-xs text-brand-blue-light hover:text-brand-blue font-bold">編集 <i class="fas fa-pen ml-1"></i></button>
@@ -985,32 +987,27 @@
                 th.className = 'p-5 font-medium text-brand-blue min-w-[180px] border-l border-brand-sand/30 bg-white/50';
                 th.innerHTML = `<div class="flex flex-col h-full justify-between gap-3"><div class="text-xs mb-1 font-bold whitespace-normal">${p.name}</div><button onclick="openModal(${p.id})" class="text-[10px] bg-white border border-brand-sand px-3 py-1.5 rounded-lg text-brand-blue-light hover:bg-brand-blue hover:text-white transition">編集</button></div>`;
                 cHead.appendChild(th);
-
                 items.forEach(item => {
                     const td = document.createElement('td');
                     td.className = 'p-4 border-l border-brand-sand/30 text-center text-sm bg-white/30 text-brand-blue';
                     let val = p[item.k];
                     
-                    // 駅情報の特殊処理
                     if (item.k === 'station') {
-                        val = (Array.isArray(p.stations) ? p.stations : (p.station ? [p.station] : [])).join('\n');
+                        val = (p.stations || []).map(s => `${s.name}(${s.walk}分)`).join('\n') || '-';
                         td.className += ' whitespace-pre-wrap';
                     }
 
                     if (val===undefined || val===null || val==='') val = '-';
                     else if (item.fmt) val = formatNum(val);
 
-                    if (item.k === 'memo' || item.k === 'route' || item.k === 'address') {
+                    if (item.k === 'memo' || item.k === 'address') {
                         td.className += ' text-left whitespace-normal min-w-[200px] text-xs'; td.textContent = val;
                     } else if (item.k === 'features') {
                         td.className += ' text-left align-top min-w-[180px]';
                         td.innerHTML = ALL_FEATURES.map(f => {
                             const hasFeature = Array.isArray(val) && val.includes(f);
-                            if (hasFeature) {
-                                return `<div class="text-xs mb-1.5 text-brand-blue font-bold flex items-center"><i class="fas fa-check-circle text-green-500 mr-1.5 text-sm"></i>${f}</div>`;
-                            } else {
-                                return `<div class="text-xs mb-1.5 text-slate-300 flex items-center"><i class="fas fa-times text-slate-200 mr-2 text-sm"></i><span class="line-through decoration-slate-200">${f}</span></div>`;
-                            }
+                            if (hasFeature) return `<div class="text-xs mb-1.5 text-brand-blue font-bold flex items-center"><i class="fas fa-check-circle text-green-500 mr-1.5 text-sm"></i>${f}</div>`;
+                            else return `<div class="text-xs mb-1.5 text-slate-300 flex items-center"><i class="fas fa-times text-slate-200 mr-2 text-sm"></i><span class="line-through decoration-slate-200">${f}</span></div>`;
                         }).join('');
                     } else {
                         if(val !== '-' && item.u) val += item.u;
@@ -1022,44 +1019,59 @@
             });
         }
 
-        // --- 物件編集 ---
         function openModal(id = null) {
             document.getElementById('editId').value = id || 'new';
             const fields = ['name','address','rent','adminFee','layout','size','floor','route','age','memo','url','deposit','keyMoney','structure','direction'];
             fields.forEach(f => { const el=document.getElementById(f); if(el) el.value=''; });
+            
             document.getElementById('station-search-input').value = '';
+            if (document.getElementById('station-walk-input')) document.getElementById('station-walk-input').value = '';
+            
             document.querySelectorAll('input[name="feature"]').forEach(cb=>cb.checked=false);
             document.getElementById('btnDelete').classList.toggle('hidden', !id);
             document.getElementById('modalTitle').innerHTML = id ? '<i class="fas fa-pen text-brand-sand"></i> 物件情報の編集' : '<i class="fas fa-plus text-brand-sand"></i> 新しい物件を登録';
-
+            
             currentModalStations = [];
             if(id) {
                 const p = properties.find(x => x.id === id);
                 if (p) {
                     fields.forEach(f => { const el=document.getElementById(f); if(el) el.value = p[f] || ''; });
                     (p.features||[]).forEach(f => { const cb = document.querySelector(`input[name="feature"][value="${f}"]`); if(cb) cb.checked=true; });
-                    // 駅情報の読み込み（配列優先、なければ旧stationから）
-                    currentModalStations = Array.isArray(p.stations) ? [...p.stations] : (p.station ? [p.station] : []);
+                    if (Array.isArray(p.stations)) {
+                        currentModalStations = [...p.stations];
+                    } else if (p.station) {
+                        currentModalStations = [{ name: p.station, walk: p.walk || '' }];
+                    }
                 }
             }
             renderModalStations();
             document.getElementById('modal').classList.remove('hidden');
         }
+
         function closeModal() { document.getElementById('modal').classList.add('hidden'); }
 
         function saveData() {
             const name = document.getElementById('name').value;
-            const address = document.getElementById('address').value;
             if(!name) return alert('物件名は必須です');
-
+            
             const data = {
-                name, address, rent: document.getElementById('rent').value, adminFee: document.getElementById('adminFee').value,
-                layout: document.getElementById('layout').value, size: document.getElementById('size').value, floor: document.getElementById('floor').value,
-                stations: [...currentModalStations],
-                walk: document.getElementById('walk').value, route: document.getElementById('route').value,
-                age: document.getElementById('age').value, deposit: document.getElementById('deposit').value, keyMoney: document.getElementById('keyMoney').value,
-                structure: document.getElementById('structure').value, direction: document.getElementById('direction').value, memo: document.getElementById('memo').value,
-                url: document.getElementById('url').value, features: Array.from(document.querySelectorAll('input[name="feature"]:checked')).map(cb=>cb.value)
+                name, 
+                address: document.getElementById('address').value, 
+                rent: document.getElementById('rent').value, 
+                adminFee: document.getElementById('adminFee').value,
+                layout: document.getElementById('layout').value, 
+                size: document.getElementById('size').value, 
+                floor: document.getElementById('floor').value,
+                stations: currentModalStations,
+                route: document.getElementById('route').value,
+                age: document.getElementById('age').value, 
+                deposit: document.getElementById('deposit').value, 
+                keyMoney: document.getElementById('keyMoney').value,
+                structure: document.getElementById('structure').value, 
+                direction: document.getElementById('direction').value, 
+                memo: document.getElementById('memo').value,
+                url: document.getElementById('url').value, 
+                features: Array.from(document.querySelectorAll('input[name="feature"]:checked')).map(cb=>cb.value)
             };
             const idVal = document.getElementById('editId').value;
             if (idVal === 'new') properties.push({id: Date.now(), ...data});
@@ -1069,6 +1081,7 @@
             }
             saveToStorage(); closeModal();
         }
+
         function deleteProp() {
             const id = document.getElementById('editId').value;
             if(id && id!=='new' && confirm('削除しますか？')) {
