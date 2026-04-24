@@ -589,38 +589,48 @@
         function closeConditionModal() { document.getElementById('conditionModal').classList.add('hidden'); }
 
         function renderFeatures() {
-            const container = document.getElementById('featuresContainer');
-            const userA_name = document.getElementById('userA').value || "Aさん";
-            const userB_name = document.getElementById('userB').value || "Bさん";
+    const container = document.getElementById('featuresContainer');
+    const userA_name = document.getElementById('userA').value || "Aさん";
+    const userB_name = document.getElementById('userB').value || "Bさん";
 
-            container.innerHTML = ALL_FEATURES.map(feat => {
-                const valA = (conditions.featuresA || {})[feat] || '';
-                const valB = (conditions.featuresB || {})[feat] || '';
-                const isMatch = (valA === 'must' && valB === 'must');
-                
-                return `
-                <div class="flex items-center justify-between gap-2 bg-white p-3 rounded-xl border border-gray-100 shadow-sm overflow-hidden">
-                    <div class="flex-1 flex flex-col items-center gap-1 border-r border-gray-50 min-w-0">
-                        <span class="text-[9px] text-blue-400 font-bold uppercase truncate w-full text-center px-1">${userA_name}</span>
-                        <div class="flex gap-1">
-                            <button onclick="setFeat('A', '${feat}', 'must')" class="btn-cond ${valA==='must'?'active-must':''}">必須</button>
-                            <button onclick="setFeat('A', '${feat}', 'ideal')" class="btn-cond ${valA==='ideal'?'active-ideal':''}">理想</button>
-                        </div>
-                    </div>
-                    <div class="flex-none px-2 text-center shrink-0 min-w-[80px]">
-                        <div class="text-[11px] font-bold text-brand-blue break-words">${feat}</div>
-                        <div class="text-sm mt-0.5">${isMatch ? '🤝🏻' : ''}</div>
-                    </div>
-                    <div class="flex-1 flex flex-col items-center gap-1 border-l border-gray-50 min-w-0">
-                        <span class="text-[9px] text-pink-400 font-bold uppercase truncate w-full text-center px-1">${userB_name}</span>
-                        <div class="flex gap-1">
-                            <button onclick="setFeat('B', '${feat}', 'must')" class="btn-cond ${valB==='must'?'active-must':''}">必須</button>
-                            <button onclick="setFeat('B', '${feat}', 'ideal')" class="btn-cond ${valB==='ideal'?'active-ideal':''}">理想</button>
-                        </div>
-                    </div>
-                </div>`;
-            }).join('');
-        }
+    container.innerHTML = ALL_FEATURES.map(feat => {
+        const valA = (conditions.featuresA || {})[feat] || '';
+        const valB = (conditions.featuresB || {})[feat] || '';
+        const isMatch = (valA === 'must' && valB === 'must');
+        
+        // ボタンの共通クラス（幅を w-12 = 3rem に固定）
+        const btnBase = "w-12 py-1.5 rounded-lg text-[11px] font-bold transition-all border";
+        const btnOff = "bg-white text-slate-400 border-slate-200 hover:bg-slate-50";
+        const btnMustA = "bg-red-50 text-red-500 border-red-200 ring-1 ring-red-200";
+        const btnIdealA = "bg-yellow-50 text-yellow-600 border-yellow-200 ring-1 ring-yellow-200";
+        const btnMustB = "bg-red-50 text-red-500 border-red-200 ring-1 ring-red-200";
+        const btnIdealB = "bg-yellow-50 text-yellow-600 border-yellow-200 ring-1 ring-yellow-200";
+
+        return `
+        <div class="grid grid-cols-[1fr_auto_1fr] items-center bg-white p-2 rounded-xl border border-brand-sand/30 shadow-sm">
+            <div class="flex flex-col items-center gap-1">
+                <span class="text-[9px] text-blue-400 font-bold truncate w-full text-center">${userA_name}</span>
+                <div class="flex gap-1">
+                    <button onclick="setFeat('A', '${feat}', 'must')" class="${btnBase} ${valA==='must' ? btnMustA : btnOff}">必須</button>
+                    <button onclick="setFeat('A', '${feat}', 'ideal')" class="${btnBase} ${valA==='ideal' ? btnIdealA : btnOff}">理想</button>
+                </div>
+            </div>
+
+            <div class="flex flex-col items-center justify-center px-2 min-w-[90px]">
+                <div class="text-[11px] font-bold text-brand-blue text-center leading-tight">${feat}</div>
+                <div class="text-sm h-5 flex items-center">${isMatch ? '🤝🏻' : ''}</div>
+            </div>
+
+            <div class="flex flex-col items-center gap-1">
+                <span class="text-[9px] text-pink-400 font-bold truncate w-full text-center">${userB_name}</span>
+                <div class="flex gap-1">
+                    <button onclick="setFeat('B', '${feat}', 'must')" class="${btnBase} ${valB==='must' ? btnMustB : btnOff}">必須</button>
+                    <button onclick="setFeat('B', '${feat}', 'ideal')" class="${btnBase} ${valB==='ideal' ? btnIdealB : btnOff}">理想</button>
+                </div>
+            </div>
+        </div>`;
+    }).join('');
+}
 
         function setFeat(user, feat, level) {
             const key = user === 'A' ? 'featuresA' : 'featuresB';
