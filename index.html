@@ -260,7 +260,7 @@
                     <h4 class="font-bold text-brand-blue mb-2 text-sm"><i class="fas fa-home text-brand-blue-light mr-1"></i> 基本条件</h4>
 
                     <!-- モーダル内ニックネーム入力 -->
-                    <div class="flex justify-between items-center px-1 gap-2">
+                    <div class="flex justify-between items-center px-1 gap-2 h-10">
                         <input type="text" id="modal_userA" placeholder="Aさん" oninput="syncNames(this, 'userA')" onblur="finalizeNames()" class="flex-1 text-center py-2 bg-blue-100 rounded-lg text-blue-600 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
                         <div class="flex-shrink-0 text-xs font-bold text-slate-400"></div>
                         <input type="text" id="modal_userB" placeholder="Bさん" oninput="syncNames(this, 'userB')" onblur="finalizeNames()" class="flex-1 text-center py-2 bg-pink-100 rounded-lg text-pink-600 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-pink-400">
@@ -276,13 +276,13 @@
                       </div>
                     </div>
 
-                    <div class="flex justify-between items-start gap-2 border-t border-gray-100 pt-4">
+                    <div class="flex justify-between items-center gap-2 border-t border-gray-100 pt-4">
                       <div class="flex-1 bg-blue-50/50 p-2 rounded-lg text-xs flex flex-col gap-2 border border-blue-100 text-left">
                         <label class="flex items-center cursor-pointer text-gray-600 hover:text-blue-600"><input type="checkbox" id="cond_struct_a_wood" value="木造" class="mr-2 rounded text-blue-500 border-gray-300">木造</label>
                         <label class="flex items-center cursor-pointer text-gray-600 hover:text-blue-600"><input type="checkbox" id="cond_struct_a_steel" value="鉄骨" class="mr-2 rounded text-blue-500 border-gray-300">鉄骨造</label>
                         <label class="flex items-center cursor-pointer text-gray-600 hover:text-blue-600"><input type="checkbox" id="cond_struct_a_rc" value="RC" class="mr-2 rounded text-blue-500 border-gray-300">RC・SRC</label>
                       </div>
-                      <div class="w-20 text-center text-xs font-bold text-gray-600 pt-2">構造</div>
+                      <div class="w-20 text-center text-xs font-bold text-gray-600">構造</div>
                       <div class="flex-1 bg-pink-50/50 p-2 rounded-lg text-xs flex flex-col gap-2 items-end border border-pink-100 text-right">
                         <label class="flex items-center flex-row-reverse cursor-pointer text-gray-600 hover:text-pink-600"><input type="checkbox" id="cond_struct_b_wood" value="木造" class="ml-2 rounded text-pink-500 border-gray-300">木造</label>
                         <label class="flex items-center flex-row-reverse cursor-pointer text-gray-600 hover:text-pink-600"><input type="checkbox" id="cond_struct_b_steel" value="鉄骨" class="ml-2 rounded text-pink-500 border-gray-300">鉄骨造</label>
