@@ -259,11 +259,11 @@
                 <div class="bg-white rounded-2xl shadow-sm p-4 border border-brand-sand/30 space-y-4">
                     <h4 class="font-bold text-brand-blue mb-2 text-sm"><i class="fas fa-home text-brand-blue-light mr-1"></i> 基本条件</h4>
 
-                    <!-- 編集可能なニックネーム入力 -->
-                    <div class="flex justify-between items-center px-2">
-                        <input type="text" id="modal_userA" placeholder="Aさん" oninput="syncNames(this, 'userA')" onchange="saveNames()" class="flex-1 text-center py-2 bg-blue-100 rounded-lg text-blue-600 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 transition">
-                        <div class="w-16"></div>
-                        <input type="text" id="modal_userB" placeholder="Bさん" oninput="syncNames(this, 'userB')" onchange="saveNames()" class="flex-1 text-center py-2 bg-pink-100 rounded-lg text-pink-600 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-pink-400 transition">
+                    <!-- モーダル内ニックネーム入力 -->
+                    <div class="flex justify-between items-center px-1 gap-2">
+                        <input type="text" id="modal_userA" placeholder="Aさん" oninput="syncNames(this, 'userA')" onblur="finalizeNames()" class="flex-1 text-center py-2 bg-blue-100 rounded-lg text-blue-600 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <div class="flex-shrink-0 text-xs font-bold text-slate-400"></div>
+                        <input type="text" id="modal_userB" placeholder="Bさん" oninput="syncNames(this, 'userB')" onblur="finalizeNames()" class="flex-1 text-center py-2 bg-pink-100 rounded-lg text-pink-600 font-bold text-sm focus:outline-none focus:ring-2 focus:ring-pink-400">
                     </div>
 
                     <div class="flex justify-between items-center gap-2 pt-2">
@@ -448,15 +448,34 @@
         let savedRoutes = [];
         let currentModalStations = []; 
 
-        /**
-         * ニックネームの同期処理
-         */
+// ニックネーム同期（入力中は空を許可）
         function syncNames(sourceEl, targetId) {
-            const val = sourceEl.value;
+            const val = sourceEl.value; 
             const targetEl = document.getElementById(targetId);
             if (targetEl) targetEl.value = val;
-            saveNames();
+            
+            // 幅の調整
+            resizeInput(sourceEl);
+            if(targetEl && targetEl.classList.contains('nickname-input')) resizeInput(targetEl);
+
+            // 入力中もlocalStorageに保存するが、空でもそのまま保存（消せるようにする）
+            localStorage.setItem('rental_userA', document.getElementById('userA').value);
+            localStorage.setItem('rental_userB', document.getElementById('userB').value);
         }
+
+        // 入力が終わった（フォーカスが外れた）時に、空ならデフォルト値を戻す
+        function finalizeNames() {
+            const userA = document.getElementById('userA');
+            const userB = document.getElementById('userB');
+            const modalA = document.getElementById('modal_userA');
+            const modalB = document.getElementById('modal_userB');
+
+            if (!userA.value.trim()) { userA.value = "Aさん"; modalA.value = "Aさん"; }
+            if (!userB.value.trim()) { userB.value = "Bさん"; modalB.value = "Bさん"; }
+            
+            saveNames(); // 最終決定版を保存
+        }
+
 
         /**
          * textareaの高さを内容に合わせて自動調整
