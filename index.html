@@ -119,13 +119,6 @@
                 </div>
                
                 <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
-                    <!-- バックアップ機能ボタン -->
-                    <button onclick="exportBackup()" class="bg-slate-50 text-slate-500 w-9 h-9 rounded-full flex items-center justify-center shadow-sm border border-slate-200 hover:bg-slate-100 transition flex-shrink-0" title="データの保存(バックアップ)"><i class="fas fa-download"></i></button>
-                    <label class="bg-slate-50 text-slate-500 w-9 h-9 rounded-full flex items-center justify-center shadow-sm border border-slate-200 hover:bg-slate-100 transition flex-shrink-0 cursor-pointer mb-0" title="データの復元">
-                        <i class="fas fa-upload"></i>
-                        <input type="file" class="hidden" accept=".json" onchange="importBackup(event)">
-                    </label>
-
                     <button onclick="openConditionModal()" class="bg-pink-50 text-pink-500 w-9 h-9 rounded-full flex items-center justify-center shadow-sm border border-pink-100 hover:bg-pink-100 transition mr-1 flex-shrink-0" title="ふたりの希望条件"><i class="fas fa-heart"></i></button>
 
                     <div class="bg-brand-beige border border-brand-sand rounded-full p-1 flex shadow-inner flex-shrink-0">
@@ -148,12 +141,16 @@
             <div id="listView" class="fade-in">
                 <div class="flex justify-between items-center mb-4 px-1">
                     <h2 class="text-base md:text-lg font-bold text-brand-blue flex items-center"><i class="fas fa-bookmark text-brand-accent mr-2"></i>検討リスト <span id="countBadge" class="ml-2 bg-brand-sand/50 text-brand-blue px-2 py-0.5 rounded text-xs font-bold border border-brand-sand">0件</span></h2>
-                    <button onclick="clearAllData()" class="text-xs text-brand-blue-light hover:text-red-400 transition flex items-center gap-1 px-3 py-1 rounded hover:bg-red-50"><i class="fas fa-trash-alt"></i> 全削除</button>
+                    <div class="flex gap-2">
+                        <button onclick="restoreFromBackup()" class="text-xs text-brand-blue-light hover:text-brand-blue transition flex items-center gap-1 px-3 py-1 rounded hover:bg-brand-beige" title="24時間前のデータに戻す"><i class="fas fa-history"></i> 復元</button>
+                        <button onclick="clearAllData()" class="text-xs text-brand-blue-light hover:text-red-400 transition flex items-center gap-1 px-3 py-1 rounded hover:bg-red-50"><i class="fas fa-trash-alt"></i> 全削除</button>
+                    </div>
                 </div>
                 <div id="propertyGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
             </div>
 
             <div id="compareView" class="hidden fade-in">
+                <!-- 比較ビューの中身（変更なし） -->
                 <div class="flex flex-col md:flex-row justify-between item-start md:items-center mb-4 px-1 gap-3">
                     <h2 class="text-base md:text-lg font-bold text-brand-blue flex items-center">
                         <i class="fas fa-balance-scale-right text-brand-accent mr-2"></i>詳細比較
@@ -188,6 +185,7 @@
             </div>
 
             <div id="mapView" class="hidden fade-in">
+                <!-- マップビューの中身（変更なし） -->
                 <div class="flex justify-between items-center mb-4 px-1">
                     <h2 class="text-base md:text-lg font-bold text-brand-blue flex items-center"><i class="fas fa-map-marked-alt text-brand-accent mr-2"></i>マップ＆アクセス検索</h2>
                 </div>
@@ -246,6 +244,7 @@
         </main>
     </div>
 
+    <!-- 各種モーダル（変更なし） -->
     <div id="conditionModal" class="fixed inset-0 bg-brand-blue/40 backdrop-blur-sm hidden z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
         <div class="bg-white w-full sm:max-w-xl rounded-t-3xl sm:rounded-3xl shadow-2xl h-[85vh] sm:h-auto sm:max-h-[80vh] flex flex-col animate-slide-up border border-brand-sand">
             <div class="p-4 border-b border-brand-sand/30 flex justify-between items-center bg-brand-beige rounded-t-3xl sticky top-0 z-10">
@@ -257,18 +256,17 @@
                 <div class="bg-white rounded-2xl shadow-sm p-4 border border-brand-sand/30 space-y-4">
                     <h4 class="font-bold text-brand-blue mb-2 text-sm"><i class="fas fa-home text-brand-blue-light mr-1"></i> 基本条件</h4>
 
-                    <!-- スマホでも名前が変更できるように、input要素に変更 -->
                     <div class="flex justify-between items-center px-2">
-                        <input type="text" id="condUserA" oninput="updateNamesFromCond()" class="flex-1 text-center py-2 bg-blue-100 rounded-lg text-blue-600 font-bold text-sm outline-none focus:ring-2 focus:ring-blue-300 transition" value="Aさん" placeholder="Aさん">
+                        <div class="flex-1 text-center py-2 bg-blue-100 rounded-lg text-blue-600 font-bold text-sm cond-user-a-label">Aさん</div>
                         <div class="w-16"></div>
-                        <input type="text" id="condUserB" oninput="updateNamesFromCond()" class="flex-1 text-center py-2 bg-pink-100 rounded-lg text-pink-600 font-bold text-sm outline-none focus:ring-2 focus:ring-pink-300 transition" value="Bさん" placeholder="Bさん">
+                        <div class="flex-1 text-center py-2 bg-pink-100 rounded-lg text-pink-600 font-bold text-sm cond-user-b-label">Bさん</div>
                     </div>
 
                     <div class="flex justify-between items-center gap-2 pt-2">
                       <div class="flex-1 bg-blue-50/50 p-2 rounded-lg flex items-center justify-end border border-blue-100">
                         <div><input type="number" id="cond_rent_a" class="w-16 p-1.5 border border-white rounded text-right text-sm focus:border-blue-300 outline-none" placeholder="8"> <span class="text-xs text-gray-500">万円以下</span></div>
                       </div>
-                      <div class="w-20 text-center text-xs font-bold text-gray-600 leading-tight">家賃<br><span class="text-[10px] font-normal text-gray-400">(管理費・共益費を含む)</span></div>
+                      <div class="w-20 text-center text-xs font-bold text-gray-600 leading-tight">家賃<br><span class="text-[10px] font-normal text-gray-400">(管込)</span></div>
                       <div class="flex-1 bg-pink-50/50 p-2 rounded-lg flex items-center justify-start border border-pink-100">
                         <div><input type="number" id="cond_rent_b" class="w-16 p-1.5 border border-white rounded text-right text-sm focus:border-pink-300 outline-none" placeholder="8"> <span class="text-xs text-gray-500">万円以下</span></div>
                       </div>
@@ -339,11 +337,10 @@
                     <h4 class="font-bold text-brand-blue mb-4 text-sm"><i class="fas fa-comment-dots text-gray-400 mr-1"></i>自由記述（その他希望）</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <!-- oninput で高さを自動調整 -->
-                            <textarea id="cond_free_a" rows="3" oninput="autoResize(this)" class="w-full border-2 border-brand-sand rounded-xl p-2 text-sm bg-blue-50/50 focus:bg-white focus:border-blue-400 outline-none transition resize-none overflow-hidden" placeholder="譲れない条件など..."></textarea>
+                            <textarea id="cond_free_a" rows="3" class="w-full border-2 border-brand-sand rounded-xl p-2 text-sm bg-blue-50/50 focus:bg-white focus:border-blue-400 outline-none transition" placeholder="譲れない条件など..."></textarea>
                         </div>
                         <div>
-                            <textarea id="cond_free_b" rows="3" oninput="autoResize(this)" class="w-full border-2 border-brand-sand rounded-xl p-2 text-sm bg-pink-50/50 focus:bg-white focus:border-pink-400 outline-none transition resize-none overflow-hidden" placeholder="譲れない条件など..."></textarea>
+                            <textarea id="cond_free_b" rows="3" class="w-full border-2 border-brand-sand rounded-xl p-2 text-sm bg-pink-50/50 focus:bg-white focus:border-pink-400 outline-none transition" placeholder="譲れない条件など..."></textarea>
                         </div>
                     </div>
                 </div>
@@ -449,62 +446,6 @@
         let savedRoutes = [];
         let currentModalStations = []; 
 
-        // テキストエリア自動リサイズ関数
-        function autoResize(el) {
-            el.style.height = 'auto';
-            el.style.height = el.scrollHeight + 'px';
-        }
-
-        // バックアップ書き出し（ダウンロード）
-        function exportBackup() {
-            const data = {
-                properties,
-                conditions,
-                destinations,
-                savedRoutes,
-                userA: document.getElementById('userA').value,
-                userB: document.getElementById('userB').value
-            };
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `my_room_plan_backup_${new Date().toISOString().slice(0,10)}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-        }
-
-        // バックアップ読み込み（復元）
-        function importBackup(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = JSON.parse(e.target.result);
-                    if (data.properties) properties = data.properties;
-                    if (data.conditions) conditions = data.conditions;
-                    if (data.destinations) destinations = data.destinations;
-                    if (data.savedRoutes) savedRoutes = data.savedRoutes;
-                    
-                    if (data.userA) document.getElementById('userA').value = data.userA;
-                    if (data.userB) document.getElementById('userB').value = data.userB;
-                    
-                    saveNames();
-                    saveToStorage();
-                    saveConditionsToStorage();
-                    saveDestinationsToStorage();
-                    saveRoutesToStorage();
-                    render();
-                    alert('バックアップデータを復元しました');
-                } catch (err) {
-                    alert('ファイルの読み込みに失敗しました。正しいバックアップファイルを選択してください。');
-                }
-            };
-            reader.readAsText(file);
-            event.target.value = ''; // リセット
-        }
-
         function resizeInput(input) {
             const hiddenSpan = document.createElement('span');
             hiddenSpan.style.fontFamily = getComputedStyle(input).fontFamily;
@@ -520,30 +461,16 @@
         }
 
         function saveNames() {
-            const nameA = document.getElementById('userA').value || "Aさん";
-            const nameB = document.getElementById('userB').value || "Bさん";
+            const nameA = document.getElementById('userA').value;
+            const nameB = document.getElementById('userB').value;
             localStorage.setItem('rental_userA', nameA);
             localStorage.setItem('rental_userB', nameB);
             
-            // 条件モーダル側の入力欄へも同期
-            if (document.getElementById('condUserA') && document.getElementById('condUserA').value !== nameA) {
-                document.getElementById('condUserA').value = nameA;
-            }
-            if (document.getElementById('condUserB') && document.getElementById('condUserB').value !== nameB) {
-                document.getElementById('condUserB').value = nameB;
-            }
+            document.querySelectorAll('.cond-user-a-label').forEach(el => el.textContent = nameA);
+            document.querySelectorAll('.cond-user-b-label').forEach(el => el.textContent = nameB);
             
             resizeInput(document.getElementById('userA'));
             resizeInput(document.getElementById('userB'));
-            
-            renderFeatures(); // こだわり条件内の名前表示を更新
-        }
-
-        // スマホ向け：条件モーダルで名前を変えたときの同期
-        function updateNamesFromCond() {
-            document.getElementById('userA').value = document.getElementById('condUserA').value || "Aさん";
-            document.getElementById('userB').value = document.getElementById('condUserB').value || "Bさん";
-            saveNames();
         }
 
         function checkPassword() {
@@ -565,8 +492,8 @@
             const savedB = localStorage.getItem('rental_userB') || "Bさん";
             document.getElementById('userA').value = savedA;
             document.getElementById('userB').value = savedB;
-            document.getElementById('condUserA').value = savedA;
-            document.getElementById('condUserB').value = savedB;
+            document.querySelectorAll('.cond-user-a-label').forEach(el => el.textContent = savedA);
+            document.querySelectorAll('.cond-user-b-label').forEach(el => el.textContent = savedB);
             
             resizeInput(document.getElementById('userA'));
             resizeInput(document.getElementById('userB'));
@@ -599,8 +526,67 @@
                         if (doc.exists) { savedRoutes = doc.data().list || []; render(); }
                         else db.collection("rental_data").doc("routes").set({ list: [] });
                     });
+
+                    // 自動バックアップの実行（データ読み込み時間を考慮して2秒後に実行）
+                    setTimeout(runBackupLogic, 2000);
+
                 } catch (e) { console.error("Firebase Error:", e); fallbackToLocal(); }
             } else { fallbackToLocal(); }
+        }
+
+        /**
+         * バックアップロジック: 24時間に1度、LocalStorageに現在の全データを保存する
+         */
+        function runBackupLogic() {
+            const BACKUP_KEY = 'rental_backup_data_v1';
+            const TIME_KEY = 'rental_last_backup_time';
+            const now = Date.now();
+            const lastBackup = localStorage.getItem(TIME_KEY);
+            const oneDay = 24 * 60 * 60 * 1000;
+
+            if (!lastBackup || (now - parseInt(lastBackup)) > oneDay) {
+                const backupPayload = {
+                    properties,
+                    conditions,
+                    destinations,
+                    savedRoutes,
+                    timestamp: now
+                };
+                localStorage.setItem(BACKUP_KEY, JSON.stringify(backupPayload));
+                localStorage.setItem(TIME_KEY, now.toString());
+                console.log("Automatic backup completed.");
+            }
+        }
+
+        /**
+         * 復元ロジック: バックアップデータがある場合、それを現在の状態に反映する
+         */
+        function restoreFromBackup() {
+            const BACKUP_KEY = 'rental_backup_data_v1';
+            const backupStr = localStorage.getItem(BACKUP_KEY);
+            if (!backupStr) {
+                alert("復元できるバックアップデータがありません。");
+                return;
+            }
+
+            const backup = JSON.parse(backupStr);
+            const date = new Date(backup.timestamp).toLocaleString();
+            
+            if (confirm(`${date} のバックアップから復元しますか？\n現在のデータは上書きされます。`)) {
+                properties = backup.properties || [];
+                conditions = backup.conditions || { featuresA: {}, featuresB: {}, freeA: "", freeB: "" };
+                destinations = backup.destinations || [];
+                savedRoutes = backup.savedRoutes || [];
+
+                // 各ストレージへ保存
+                saveToStorage();
+                saveConditionsToStorage();
+                saveDestinationsToStorage();
+                saveRoutesToStorage();
+
+                alert("復元が完了しました。最新の状態を表示するためにページを更新します。");
+                location.reload();
+            }
         }
 
         function fallbackToLocal() {
@@ -663,12 +649,6 @@
                 document.getElementById(`cond_struct_b_${t}`).checked = (conditions.structB||[]).includes(valB);
             });
             document.getElementById('conditionModal').classList.remove('hidden');
-
-            // 開いたタイミングでテキストエリアの高さを調整
-            setTimeout(() => {
-                autoResize(document.getElementById('cond_free_a'));
-                autoResize(document.getElementById('cond_free_b'));
-            }, 10);
         }
         
         function closeConditionModal() { document.getElementById('conditionModal').classList.add('hidden'); }
@@ -830,7 +810,7 @@
                                 li.onclick = () => {
                                     const target = `${name}駅`;
                                     if (isForPropertyModal) {
-                                        input.value = target; // モーダルでは入力欄にセットするだけ
+                                        input.value = target; 
                                         list.classList.add('hidden');
                                     } else {
                                         if (!destinations.some(d => d.name === target)) {
@@ -857,19 +837,11 @@
             const name = nameInput.value.trim();
             const walk = walkInput.value.trim();
 
-            if (!name) {
-                alert('駅名を入力してください');
-                return;
-            }
-
-            if (currentModalStations.some(s => s.name === name)) {
-                alert('その駅はすでに追加されています');
-                return;
-            }
+            if (!name) { alert('駅名を入力してください'); return; }
+            if (currentModalStations.some(s => s.name === name)) { alert('その駅はすでに追加されています'); return; }
 
             currentModalStations.push({ name: name, walk: walk });
             renderModalStations();
-            
             nameInput.value = '';
             walkInput.value = '';
         }
