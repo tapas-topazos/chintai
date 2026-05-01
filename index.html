@@ -119,6 +119,13 @@
                 </div>
                
                 <div class="flex items-center gap-2 overflow-x-auto no-scrollbar">
+                    <!-- バックアップ機能ボタン -->
+                    <button onclick="exportBackup()" class="bg-slate-50 text-slate-500 w-9 h-9 rounded-full flex items-center justify-center shadow-sm border border-slate-200 hover:bg-slate-100 transition flex-shrink-0" title="データの保存(バックアップ)"><i class="fas fa-download"></i></button>
+                    <label class="bg-slate-50 text-slate-500 w-9 h-9 rounded-full flex items-center justify-center shadow-sm border border-slate-200 hover:bg-slate-100 transition flex-shrink-0 cursor-pointer mb-0" title="データの復元">
+                        <i class="fas fa-upload"></i>
+                        <input type="file" class="hidden" accept=".json" onchange="importBackup(event)">
+                    </label>
+
                     <button onclick="openConditionModal()" class="bg-pink-50 text-pink-500 w-9 h-9 rounded-full flex items-center justify-center shadow-sm border border-pink-100 hover:bg-pink-100 transition mr-1 flex-shrink-0" title="ふたりの希望条件"><i class="fas fa-heart"></i></button>
 
                     <div class="bg-brand-beige border border-brand-sand rounded-full p-1 flex shadow-inner flex-shrink-0">
@@ -250,17 +257,18 @@
                 <div class="bg-white rounded-2xl shadow-sm p-4 border border-brand-sand/30 space-y-4">
                     <h4 class="font-bold text-brand-blue mb-2 text-sm"><i class="fas fa-home text-brand-blue-light mr-1"></i> 基本条件</h4>
 
+                    <!-- スマホでも名前が変更できるように、input要素に変更 -->
                     <div class="flex justify-between items-center px-2">
-                        <div class="flex-1 text-center py-2 bg-blue-100 rounded-lg text-blue-600 font-bold text-sm cond-user-a-label">Aさん</div>
+                        <input type="text" id="condUserA" oninput="updateNamesFromCond()" class="flex-1 text-center py-2 bg-blue-100 rounded-lg text-blue-600 font-bold text-sm outline-none focus:ring-2 focus:ring-blue-300 transition" value="Aさん" placeholder="Aさん">
                         <div class="w-16"></div>
-                        <div class="flex-1 text-center py-2 bg-pink-100 rounded-lg text-pink-600 font-bold text-sm cond-user-b-label">Bさん</div>
+                        <input type="text" id="condUserB" oninput="updateNamesFromCond()" class="flex-1 text-center py-2 bg-pink-100 rounded-lg text-pink-600 font-bold text-sm outline-none focus:ring-2 focus:ring-pink-300 transition" value="Bさん" placeholder="Bさん">
                     </div>
 
                     <div class="flex justify-between items-center gap-2 pt-2">
                       <div class="flex-1 bg-blue-50/50 p-2 rounded-lg flex items-center justify-end border border-blue-100">
                         <div><input type="number" id="cond_rent_a" class="w-16 p-1.5 border border-white rounded text-right text-sm focus:border-blue-300 outline-none" placeholder="8"> <span class="text-xs text-gray-500">万円以下</span></div>
                       </div>
-                      <div class="w-20 text-center text-xs font-bold text-gray-600 leading-tight">家賃<br><span class="text-[10px] font-normal text-gray-400">(管込)</span></div>
+                      <div class="w-20 text-center text-xs font-bold text-gray-600 leading-tight">家賃<br><span class="text-[10px] font-normal text-gray-400">(管理費・共益費を含む)</span></div>
                       <div class="flex-1 bg-pink-50/50 p-2 rounded-lg flex items-center justify-start border border-pink-100">
                         <div><input type="number" id="cond_rent_b" class="w-16 p-1.5 border border-white rounded text-right text-sm focus:border-pink-300 outline-none" placeholder="8"> <span class="text-xs text-gray-500">万円以下</span></div>
                       </div>
@@ -331,10 +339,11 @@
                     <h4 class="font-bold text-brand-blue mb-4 text-sm"><i class="fas fa-comment-dots text-gray-400 mr-1"></i>自由記述（その他希望）</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
-                            <textarea id="cond_free_a" rows="3" class="w-full border-2 border-brand-sand rounded-xl p-2 text-sm bg-blue-50/50 focus:bg-white focus:border-blue-400 outline-none transition" placeholder="譲れない条件など..."></textarea>
+                            <!-- oninput で高さを自動調整 -->
+                            <textarea id="cond_free_a" rows="3" oninput="autoResize(this)" class="w-full border-2 border-brand-sand rounded-xl p-2 text-sm bg-blue-50/50 focus:bg-white focus:border-blue-400 outline-none transition resize-none overflow-hidden" placeholder="譲れない条件など..."></textarea>
                         </div>
                         <div>
-                            <textarea id="cond_free_b" rows="3" class="w-full border-2 border-brand-sand rounded-xl p-2 text-sm bg-pink-50/50 focus:bg-white focus:border-pink-400 outline-none transition" placeholder="譲れない条件など..."></textarea>
+                            <textarea id="cond_free_b" rows="3" oninput="autoResize(this)" class="w-full border-2 border-brand-sand rounded-xl p-2 text-sm bg-pink-50/50 focus:bg-white focus:border-pink-400 outline-none transition resize-none overflow-hidden" placeholder="譲れない条件など..."></textarea>
                         </div>
                     </div>
                 </div>
@@ -440,6 +449,62 @@
         let savedRoutes = [];
         let currentModalStations = []; 
 
+        // テキストエリア自動リサイズ関数
+        function autoResize(el) {
+            el.style.height = 'auto';
+            el.style.height = el.scrollHeight + 'px';
+        }
+
+        // バックアップ書き出し（ダウンロード）
+        function exportBackup() {
+            const data = {
+                properties,
+                conditions,
+                destinations,
+                savedRoutes,
+                userA: document.getElementById('userA').value,
+                userB: document.getElementById('userB').value
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `my_room_plan_backup_${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // バックアップ読み込み（復元）
+        function importBackup(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = JSON.parse(e.target.result);
+                    if (data.properties) properties = data.properties;
+                    if (data.conditions) conditions = data.conditions;
+                    if (data.destinations) destinations = data.destinations;
+                    if (data.savedRoutes) savedRoutes = data.savedRoutes;
+                    
+                    if (data.userA) document.getElementById('userA').value = data.userA;
+                    if (data.userB) document.getElementById('userB').value = data.userB;
+                    
+                    saveNames();
+                    saveToStorage();
+                    saveConditionsToStorage();
+                    saveDestinationsToStorage();
+                    saveRoutesToStorage();
+                    render();
+                    alert('バックアップデータを復元しました');
+                } catch (err) {
+                    alert('ファイルの読み込みに失敗しました。正しいバックアップファイルを選択してください。');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = ''; // リセット
+        }
+
         function resizeInput(input) {
             const hiddenSpan = document.createElement('span');
             hiddenSpan.style.fontFamily = getComputedStyle(input).fontFamily;
@@ -455,16 +520,30 @@
         }
 
         function saveNames() {
-            const nameA = document.getElementById('userA').value;
-            const nameB = document.getElementById('userB').value;
+            const nameA = document.getElementById('userA').value || "Aさん";
+            const nameB = document.getElementById('userB').value || "Bさん";
             localStorage.setItem('rental_userA', nameA);
             localStorage.setItem('rental_userB', nameB);
             
-            document.querySelectorAll('.cond-user-a-label').forEach(el => el.textContent = nameA);
-            document.querySelectorAll('.cond-user-b-label').forEach(el => el.textContent = nameB);
+            // 条件モーダル側の入力欄へも同期
+            if (document.getElementById('condUserA') && document.getElementById('condUserA').value !== nameA) {
+                document.getElementById('condUserA').value = nameA;
+            }
+            if (document.getElementById('condUserB') && document.getElementById('condUserB').value !== nameB) {
+                document.getElementById('condUserB').value = nameB;
+            }
             
             resizeInput(document.getElementById('userA'));
             resizeInput(document.getElementById('userB'));
+            
+            renderFeatures(); // こだわり条件内の名前表示を更新
+        }
+
+        // スマホ向け：条件モーダルで名前を変えたときの同期
+        function updateNamesFromCond() {
+            document.getElementById('userA').value = document.getElementById('condUserA').value || "Aさん";
+            document.getElementById('userB').value = document.getElementById('condUserB').value || "Bさん";
+            saveNames();
         }
 
         function checkPassword() {
@@ -486,8 +565,8 @@
             const savedB = localStorage.getItem('rental_userB') || "Bさん";
             document.getElementById('userA').value = savedA;
             document.getElementById('userB').value = savedB;
-            document.querySelectorAll('.cond-user-a-label').forEach(el => el.textContent = savedA);
-            document.querySelectorAll('.cond-user-b-label').forEach(el => el.textContent = savedB);
+            document.getElementById('condUserA').value = savedA;
+            document.getElementById('condUserB').value = savedB;
             
             resizeInput(document.getElementById('userA'));
             resizeInput(document.getElementById('userB'));
@@ -584,53 +663,58 @@
                 document.getElementById(`cond_struct_b_${t}`).checked = (conditions.structB||[]).includes(valB);
             });
             document.getElementById('conditionModal').classList.remove('hidden');
+
+            // 開いたタイミングでテキストエリアの高さを調整
+            setTimeout(() => {
+                autoResize(document.getElementById('cond_free_a'));
+                autoResize(document.getElementById('cond_free_b'));
+            }, 10);
         }
         
         function closeConditionModal() { document.getElementById('conditionModal').classList.add('hidden'); }
 
         function renderFeatures() {
-    const container = document.getElementById('featuresContainer');
-    const userA_name = document.getElementById('userA').value || "Aさん";
-    const userB_name = document.getElementById('userB').value || "Bさん";
+            const container = document.getElementById('featuresContainer');
+            const userA_name = document.getElementById('userA').value || "Aさん";
+            const userB_name = document.getElementById('userB').value || "Bさん";
 
-    container.innerHTML = ALL_FEATURES.map(feat => {
-        const valA = (conditions.featuresA || {})[feat] || '';
-        const valB = (conditions.featuresB || {})[feat] || '';
-        const isMatch = (valA === 'must' && valB === 'must');
-        
-        // ボタンの共通クラス（幅を w-12 = 3rem に固定）
-        const btnBase = "w-12 py-1.5 rounded-lg text-[11px] font-bold transition-all border";
-        const btnOff = "bg-white text-slate-400 border-slate-200 hover:bg-slate-50";
-        const btnMustA = "bg-red-50 text-red-500 border-red-200 ring-1 ring-red-200";
-        const btnIdealA = "bg-yellow-50 text-yellow-600 border-yellow-200 ring-1 ring-yellow-200";
-        const btnMustB = "bg-red-50 text-red-500 border-red-200 ring-1 ring-red-200";
-        const btnIdealB = "bg-yellow-50 text-yellow-600 border-yellow-200 ring-1 ring-yellow-200";
+            container.innerHTML = ALL_FEATURES.map(feat => {
+                const valA = (conditions.featuresA || {})[feat] || '';
+                const valB = (conditions.featuresB || {})[feat] || '';
+                const isMatch = (valA === 'must' && valB === 'must');
+                
+                const btnBase = "w-12 py-1.5 rounded-lg text-[11px] font-bold transition-all border";
+                const btnOff = "bg-white text-slate-400 border-slate-200 hover:bg-slate-50";
+                const btnMustA = "bg-red-50 text-red-500 border-red-200 ring-1 ring-red-200";
+                const btnIdealA = "bg-yellow-50 text-yellow-600 border-yellow-200 ring-1 ring-yellow-200";
+                const btnMustB = "bg-red-50 text-red-500 border-red-200 ring-1 ring-red-200";
+                const btnIdealB = "bg-yellow-50 text-yellow-600 border-yellow-200 ring-1 ring-yellow-200";
 
-        return `
-        <div class="grid grid-cols-[1fr_auto_1fr] items-center bg-white p-2 rounded-xl border border-brand-sand/30 shadow-sm">
-            <div class="flex flex-col items-center gap-1">
-                <span class="text-[9px] text-blue-400 font-bold truncate w-full text-center">${userA_name}</span>
-                <div class="flex gap-1">
-                    <button onclick="setFeat('A', '${feat}', 'must')" class="${btnBase} ${valA==='must' ? btnMustA : btnOff}">必須</button>
-                    <button onclick="setFeat('A', '${feat}', 'ideal')" class="${btnBase} ${valA==='ideal' ? btnIdealA : btnOff}">理想</button>
-                </div>
-            </div>
+                return `
+                <div class="grid grid-cols-[1fr_auto_1fr] items-center bg-white p-2 rounded-xl border border-brand-sand/30 shadow-sm">
+                    <div class="flex flex-col items-center gap-1">
+                        <span class="text-[9px] text-blue-400 font-bold truncate w-full text-center">${userA_name}</span>
+                        <div class="flex gap-1">
+                            <button onclick="setFeat('A', '${feat}', 'must')" class="${btnBase} ${valA==='must' ? btnMustA : btnOff}">必須</button>
+                            <button onclick="setFeat('A', '${feat}', 'ideal')" class="${btnBase} ${valA==='ideal' ? btnIdealA : btnOff}">理想</button>
+                        </div>
+                    </div>
 
-            <div class="flex flex-col items-center justify-center px-2 min-w-[90px]">
-                <div class="text-[11px] font-bold text-brand-blue text-center leading-tight">${feat}</div>
-                <div class="text-sm h-5 flex items-center">${isMatch ? '🤝🏻' : ''}</div>
-            </div>
+                    <div class="flex flex-col items-center justify-center px-2 min-w-[90px]">
+                        <div class="text-[11px] font-bold text-brand-blue text-center leading-tight">${feat}</div>
+                        <div class="text-sm h-5 flex items-center">${isMatch ? '🤝🏻' : ''}</div>
+                    </div>
 
-            <div class="flex flex-col items-center gap-1">
-                <span class="text-[9px] text-pink-400 font-bold truncate w-full text-center">${userB_name}</span>
-                <div class="flex gap-1">
-                    <button onclick="setFeat('B', '${feat}', 'must')" class="${btnBase} ${valB==='must' ? btnMustB : btnOff}">必須</button>
-                    <button onclick="setFeat('B', '${feat}', 'ideal')" class="${btnBase} ${valB==='ideal' ? btnIdealB : btnOff}">理想</button>
-                </div>
-            </div>
-        </div>`;
-    }).join('');
-}
+                    <div class="flex flex-col items-center gap-1">
+                        <span class="text-[9px] text-pink-400 font-bold truncate w-full text-center">${userB_name}</span>
+                        <div class="flex gap-1">
+                            <button onclick="setFeat('B', '${feat}', 'must')" class="${btnBase} ${valB==='must' ? btnMustB : btnOff}">必須</button>
+                            <button onclick="setFeat('B', '${feat}', 'ideal')" class="${btnBase} ${valB==='ideal' ? btnIdealB : btnOff}">理想</button>
+                        </div>
+                    </div>
+                </div>`;
+            }).join('');
+        }
 
         function setFeat(user, feat, level) {
             const key = user === 'A' ? 'featuresA' : 'featuresB';
@@ -767,7 +851,6 @@
             });
         }
 
-        // 新しい駅追加関数
         function addStationWithWalkBtn() {
             const nameInput = document.getElementById('station-search-input');
             const walkInput = document.getElementById('station-walk-input');
@@ -787,7 +870,6 @@
             currentModalStations.push({ name: name, walk: walk });
             renderModalStations();
             
-            // 追加後に入力欄をリセット
             nameInput.value = '';
             walkInput.value = '';
         }
